@@ -18,7 +18,11 @@
     },
     "include": [
         "src/*",
-        "src/models/*"
+        "src/models/*",
+        "src/routes/*",
+        "src/controllers/*",
+        "src/compute/*",
+        "src/compute/base/*"
     ],
     "exclude": [
         "build/*"

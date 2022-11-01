@@ -17,7 +17,7 @@ BDD.connectToDataBase()
 });
 
 //Routes
-
+import { userRoutes } from "./routes/user";
 
 const app = express();
 
@@ -25,8 +25,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use("/images", express.static(path.join("images")));
-
 //Use routes
+app.use("/api/user", userRoutes);
 
 module.exports = app;
