@@ -20,6 +20,8 @@
         "src/*",
         "src/models/*",
         "src/routes/*",
+        "src/error/*",
+        "src/middleware/*",
         "src/controllers/*",
         "src/compute/*",
         "src/compute/base/*"
