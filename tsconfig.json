@@ -17,7 +17,8 @@
         }
     },
     "include": [
-        "src/*"
+        "src/*",
+        "src/models/*"
     ],
     "exclude": [
         "build/*"
