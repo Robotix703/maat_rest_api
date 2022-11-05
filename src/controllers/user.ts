@@ -18,13 +18,30 @@ export namespace userController {
     }
   
     bcrypt.hash(req.body.password, 10).then((hash: string) => {
-      baseUser.register(req.body.name, hash, req.body.number)
+      baseUser.register(req.body.name, hash, req.body.userNumber)
         .then((result: any) => {
           if(result.errors) throw result;
-                    
-          res.status(201).json({
-            status: 'OK'
-          });
+
+          baseUser.getByName(req.body.name)
+          .then((user: IUser) => { 
+            const token = jwt.sign(
+              {
+                email: user.name,
+                userId: user._id,
+                number: user.number
+              },
+              process.env.JWT as jwt.Secret,
+              { expiresIn: "12h" }
+            );
+      
+            res.status(200).json({
+              token: token,
+              expiresIn: parseInt(process.env.TOKENLIFETIME as string) * 60 * 60,
+              userId: user._id,
+              number: user.number,
+              name: user.name
+            });
+          })
         })
         .catch((error: any) => {
           res.status(500).json({
@@ -68,7 +85,8 @@ export namespace userController {
           token: token,
           expiresIn: parseInt(process.env.TOKENLIFETIME as string) * 60 * 60,
           userId: fetchUser._id,
-          number: fetchUser.number
+          number: fetchUser.number,
+          name: fetchUser.name
         });
       })
     })
