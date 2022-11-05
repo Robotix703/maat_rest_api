@@ -1,19 +1,19 @@
 import User, { IUser } from "../../models/user";
 
 export namespace baseUser {
-    export async function register(name: string, password: string) : Promise<any> {
+    export async function register(name: string, password: string, number: number) : Promise<any> {
+
+        if(number < 0 || number > 1){
+            return {errors: "Wrong number"};
+        }
+
         const user = new User({
             name: name,
-            password: password
-        });
-
-        return user.save()
-        .then((result: any) => {
-            return { id: result._id, user: user };
+            password: password,
+            number: number
         })
-        .catch((error: Error) => {
-            return { error: error };
-        });
+
+        return user.save();
     }
 
     export async function getByName(name : string) : Promise<IUser> {
