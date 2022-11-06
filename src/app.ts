@@ -18,6 +18,7 @@ BDD.connectToDataBase()
 
 //Routes
 import { userRoutes } from "./routes/user";
+import { listRoutes } from "./routes/list";
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //Use routes
 app.use("/api/user", userRoutes);
+app.use("/api/list", listRoutes);
 
 module.exports = app;

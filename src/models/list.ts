@@ -14,7 +14,7 @@ export const listSchema = mongoose.Schema({
     main: { type: Boolean, required:true },
     balance1: { type: Number, required: true },
     balance2: { type: Number, required: true },
-    merged: { type: Number, required:true }
+    merged: { type: Boolean, required:true }
 });
   
 const List = mongoose.model('List', listSchema);
