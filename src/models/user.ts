@@ -4,6 +4,13 @@ export interface IUser {
     password: string
     number: number
 }
+
+
+export interface IPrettyUser {
+    name: string,
+    id: string,
+    number: number
+}
   
 const mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');

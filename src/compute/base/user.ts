@@ -19,4 +19,8 @@ export namespace baseUser {
     export async function getByName(name : string) : Promise<IUser> {
         return User.findOne({ name: name });
     }
+
+    export async function getAllUser(): Promise<IUser[]>{
+        return User.find();
+    }
 }
