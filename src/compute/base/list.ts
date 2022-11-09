@@ -7,6 +7,10 @@ export namespace baseList {
         return List.find();
     }
 
+    export async function getListById(listId: string): Promise<IList> {
+        return List.findById(listId);
+    }
+
     export async function register(
         name: string, 
         main: boolean, 

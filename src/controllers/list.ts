@@ -26,7 +26,6 @@ export namespace listController {
 
   //GET
   export async function readLists(req: any, res: Response){
-
     let fetchedLists: IList[] | void = await baseList.getAllLists()
     .catch((error: Error) => {
       res.status(500).json({

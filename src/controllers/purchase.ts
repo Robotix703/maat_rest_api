@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import { IUpdateOne } from "../models/mongoose";
 
 import { basePurchase } from "../compute/base/purchase";
+import { baseList } from "../compute/base/list";
 import { IPurchase } from "../models/purchase";
+import { IList } from "../models/list";
 
 export namespace purchaseController {
   //POST
@@ -29,23 +31,41 @@ export namespace purchaseController {
 
   //GET
   export async function readPurchases(req: any, res: Response){
-
     if(!req.query.listId){
-        res.status(500).json({
-            errorMessage: "No listId provided"
-        })
-        return;
+      res.status(500).json({
+        errorMessage: "No listId provided"
+      });
+      return;
     }
 
     let fetchedPurchases: IPurchase[] | void = await basePurchase.getPurchasesByListId(req.query.listId)
     .catch((error: Error) => {
       res.status(500).json({
         errorMessage: error
+      });
+      return;
+    });
+
+    let list: IList | void = await baseList.getListById(req.query.listId)
+    .catch((error: Error) => {
+      res.status(500).json({
+        errorMessage: error
       })
       return;
     });
-    
-    res.status(200).json(fetchedPurchases);
+
+    if(!list){
+      res.status(500).json({
+        errorMessage: "List id not found"
+      });
+      return;
+    }
+
+    let data = {
+      listName: list.name,
+      purchases: fetchedPurchases
+    }
+    res.status(200).json(data);
   }
 
   //PUT
