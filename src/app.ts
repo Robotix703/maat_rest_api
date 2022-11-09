@@ -1,6 +1,5 @@
 import express from 'express';
 import bodyParser from "body-parser";
-import path from 'path';
 import cors from 'cors';
 
 import * as BDD from './BDD';
@@ -19,6 +18,7 @@ BDD.connectToDataBase()
 //Routes
 import { userRoutes } from "./routes/user";
 import { listRoutes } from "./routes/list";
+import { purchaseRoutes } from './routes/purchase';
 
 const app = express();
 
@@ -29,5 +29,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //Use routes
 app.use("/api/user", userRoutes);
 app.use("/api/list", listRoutes);
+app.use("/api/purchase", purchaseRoutes);
 
 module.exports = app;

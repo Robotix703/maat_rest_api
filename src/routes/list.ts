@@ -16,4 +16,4 @@ listRoutes.post("/", checkAuth, listController.writeList);
 listRoutes.put("/:id", checkAuth, listController.updateList);
 
 //DELETE
-listRoutes.delete("/:id", checkAuth, listController. deleteList);
+listRoutes.delete("/:id", checkAuth, listController.deleteList);
