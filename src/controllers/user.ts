@@ -98,21 +98,9 @@ export namespace userController {
   }
 
   export function getAllUser(req: Request, res: Response){
-    baseUser.getAllUser()
+    baseUser.getPrettyUsers()
     .then(data => {
-      let users: IPrettyUser[] = [
-        {
-          name: data[0].name,
-          id: data[0]._id,
-          number: data[0].number
-        },
-        {
-          name: data[1].name,
-          id: data[1]._id,
-          number: data[1].number
-        }
-      ];
-      res.status(200).json(users);
+      res.status(200).json(data);
     })
     .catch((error: Error) => {
       return res.status(401).json({

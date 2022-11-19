@@ -1,4 +1,4 @@
-import User, { IUser } from "../../models/user";
+import User, { IPrettyUser, IUser } from "../../models/user";
 
 export namespace baseUser {
     export async function register(name: string, password: string, number: number) : Promise<any> {
@@ -22,5 +22,23 @@ export namespace baseUser {
 
     export async function getAllUser(): Promise<IUser[]>{
         return User.find();
+    }
+
+    export async function getPrettyUsers(): Promise<IPrettyUser[]>{
+        const users = await getAllUser();
+
+        const prettyUsers: IPrettyUser[] = [
+            {
+              name: users[0].name,
+              id: users[0]._id,
+              number: users[0].number
+            },
+            {
+              name: users[1].name,
+              id: users[1]._id,
+              number: users[1].number
+            }
+        ];
+        return prettyUsers;
     }
 }
