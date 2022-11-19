@@ -12,21 +12,25 @@ export namespace basePurchase {
         title: string,
         amount: number,
         date: Date,
-        to: string,
+        buyTo: string,
         from: string,
         listId: string,
-        balance1: string,
-        balance2: string
+        total0: number,
+        total1: number,
+        balance0: number,
+        balance1: number
     ) : Promise<any> {
         const purchase = new Purchase({
             title: title,
             amount: amount,
             date: date,
-            to: to,
+            buyTo: buyTo,
             from: from,
             listId: listId,
-            balance1: balance1,
-            balance2: balance2
+            total0: total0,
+            total1: total1,
+            balance0: balance0,
+            balance1: balance1
         });
 
         return await purchase.save()
@@ -43,22 +47,26 @@ export namespace basePurchase {
         title: string,
         amount: number,
         date: Date,
-        to: string[],
+        buyTo: string[],
         from: string,
         listId: string,
-        balance1: string,
-        balance2: string
+        total0: number,
+        total1: number,
+        balance0: number,
+        balance1: number
     ) : Promise<IUpdateOne> {
         let elementToUpdate : any = { _id: _id };
 
         if(title) elementToUpdate.title = title;
         if(amount) elementToUpdate.amount = amount;
         if(date) elementToUpdate.date = date;
-        if(to) elementToUpdate.to = to;
+        if(buyTo) elementToUpdate.buyTo = buyTo;
         if(from) elementToUpdate.from = from;
         if(listId) elementToUpdate.listId = listId;
+        if(total0) elementToUpdate.total0 = total0;
+        if(total1) elementToUpdate.total1 = total1;
+        if(balance0) elementToUpdate.balance0 = balance0;
         if(balance1) elementToUpdate.balance1 = balance1;
-        if(balance2) elementToUpdate.balance2 = balance2;
     
         return Purchase.updateOne({ _id: _id }, elementToUpdate);
     }

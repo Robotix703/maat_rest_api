@@ -14,15 +14,19 @@ export namespace baseList {
     export async function register(
         name: string, 
         main: boolean, 
-        balance1: number,
-        balance2: number, 
+        total0: number,
+        total1: number,
+        balance0: number,
+        balance1: number, 
         merged: boolean
     ) : Promise<any> {
         const list = new List({
             name: name,
             main: main,
+            total0: total0,
+            total1: total1,
+            balance0: balance0,
             balance1: balance1,
-            balance2: balance2,
             merged: merged
         });
 
@@ -39,16 +43,20 @@ export namespace baseList {
         _id : string, 
         name : string, 
         main : boolean, 
+        total0: number,
+        total1: number,
+        balance0 : number, 
         balance1 : number, 
-        balance2 : number, 
         merged : boolean
     ) : Promise<IUpdateOne> {
         let elementToUpdate : any = { _id: _id };
     
         if(name) elementToUpdate.name = name;
         if(main) elementToUpdate.main = main;
+        if(total0) elementToUpdate.total0 = total0;
+        if(total1) elementToUpdate.total1 = total1;
+        if(balance0) elementToUpdate.balance0 = balance0;
         if(balance1) elementToUpdate.balance1 = balance1;
-        if(balance2) elementToUpdate.balance2 = balance2;
         if(merged) elementToUpdate.merged = merged;
     
         return List.updateOne({ _id: _id }, elementToUpdate);

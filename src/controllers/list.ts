@@ -10,8 +10,10 @@ export namespace listController {
     baseList.register(
       req.body.name,
       req.body.main as boolean,
+      req.body.total0,
+      req.body.total1,
+      req.body.balance0,
       req.body.balance1,
-      req.body.balance2,
       req.body.merged as boolean
     )
     .then((result: any) => {
@@ -56,8 +58,10 @@ export namespace listController {
       req.params.id,
       req.body.name,
       req.body.main,
+      req.body.total0,
+      req.body.total1,
+      req.body.balance0,
       req.body.balance1,
-      req.body.balance2,
       req.body.merged
     )
     .then((result: IUpdateOne) => {

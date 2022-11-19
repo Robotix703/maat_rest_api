@@ -13,11 +13,13 @@ export namespace purchaseController {
         req.body.title,
         req.body.amount,
         req.body.date,
-        req.body.To,
+        req.body.buyTo,
         req.body.from,
         req.body.listId,
-        req.body.balance1,
-        req.body.balance2
+        req.body.total0,
+        req.body.total1,
+        req.body.balance0,
+        req.body.balance1
     )
     .then((result: any) => {
       res.status(201).json(result);
@@ -76,11 +78,13 @@ export namespace purchaseController {
         req.body.title,
         req.body.amount,
         req.body.date,
-        req.body.To,
+        req.body.buyTo,
         req.body.from,
         req.body.listId,
-        req.body.balance1,
-        req.body.balance2
+        req.body.total0,
+        req.body.total1,
+        req.body.balance0,
+        req.body.balance1
     )
     .then((result: IUpdateOne) => {
       if (result.modifiedCount > 0) {
