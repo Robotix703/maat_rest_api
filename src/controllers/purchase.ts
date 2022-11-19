@@ -34,7 +34,13 @@ export namespace purchaseController {
     });
   }
   export async function addPurchase(req: Request, res: Response){
-    let data = req.body as ISendPurchaseData;
+    let data : ISendPurchaseData = {
+      title: req.body.title,
+      amount: parseInt(req.body.amount),
+      buyTo: JSON.parse(req.body.buyTo),
+      from: req.body.from,
+      listId: req.body.listId
+    };
 
     computePurchase.add(data)
     .then((result: any) => {

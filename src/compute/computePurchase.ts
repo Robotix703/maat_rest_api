@@ -16,8 +16,17 @@ export namespace computePurchase {
             return new Error("Error with purchase");
         }
 
+        //List
+        let list = await baseList.getListById(data.listId);
+
+        //Update list
+        list.balance0 += purchase.balance0;
+        list.balance1 += purchase.balance1;
+        list.total0 += purchase.total0;
+        list.total1 += purchase.total1;
+
         //Register purchase
-        basePurchase.register(
+        return basePurchase.register(
             purchase.title,
             purchase.amount,
             purchase.date,
@@ -31,12 +40,12 @@ export namespace computePurchase {
         )
         .then((result: any) => {
             //Update List
-            baseList.updateTotalAndBalance(
+            return baseList.updateTotalAndBalance(
                 data.listId,
-                purchase.total0,
-                purchase.total1,
-                purchase.balance0,
-                purchase.balance1
+                list.total0,
+                list.total1,
+                list.balance0,
+                list.balance1
             )
             .then((result: IUpdateOne) => {
                 if (result.modifiedCount > 0) {
@@ -74,20 +83,20 @@ export namespace computePurchase {
             else
             {
                 //Balance
-                balance0 = (data.from === prettyUser[0].id) ? data.amount : -data.amount;
-                balance1 = (data.from === prettyUser[1].id) ? data.amount : -data.amount;
+                balance0 = (data.from === prettyUser[0].id.toString()) ? data.amount : -data.amount;
+                balance1 = (data.from === prettyUser[1].id.toString()) ? data.amount : -data.amount;
             }
         }
         //Divide
         else
         {
             //Balance
-            balance0 = (data.from === prettyUser[0].id) ? data.amount / 2 : -data.amount / 2;
-            balance1 = (data.from === prettyUser[1].id) ? data.amount / 2 : -data.amount / 2;
+            balance0 = (data.from === prettyUser[0].id.toString()) ? data.amount / 2 : -data.amount / 2;
+            balance1 = (data.from === prettyUser[1].id.toString()) ? data.amount / 2 : -data.amount / 2;
         }
 
         //Total
-        (data.from === prettyUser[0].id) ? total0 = data.amount : total1 = data.amount;
+        (data.from === prettyUser[0].id.toString()) ? total0 = data.amount : total1 = data.amount;
 
         const newPurchase: IPurchase = {
             _id: '',
