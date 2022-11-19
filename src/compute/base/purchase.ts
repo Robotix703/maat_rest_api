@@ -12,7 +12,7 @@ export namespace basePurchase {
         title: string,
         amount: number,
         date: Date,
-        buyTo: string,
+        buyTo: string[],
         from: string,
         listId: string,
         total0: number,

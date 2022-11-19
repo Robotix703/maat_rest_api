@@ -7,7 +7,7 @@ export namespace baseList {
         return List.find();
     }
 
-    export async function getListById(listId: string): Promise<IList> {
+    export async function getListById(listId: string): Promise<IList | null> {
         return List.findById(listId);
     }
 
@@ -59,6 +59,23 @@ export namespace baseList {
         if(balance1) elementToUpdate.balance1 = balance1;
         if(merged) elementToUpdate.merged = merged;
     
+        return List.updateOne({ _id: _id }, elementToUpdate);
+    }
+
+    export async function updateTotalAndBalance(
+        _id: string,
+        total0: number,
+        total1: number,
+        balance0 : number, 
+        balance1 : number
+    ) : Promise<IUpdateOne> {
+        let elementToUpdate : any = { _id: _id };
+
+        if(total0) elementToUpdate.total0 = total0;
+        if(total1) elementToUpdate.total1 = total1;
+        if(balance0) elementToUpdate.balance0 = balance0;
+        if(balance1) elementToUpdate.balance1 = balance1;
+
         return List.updateOne({ _id: _id }, elementToUpdate);
     }
     

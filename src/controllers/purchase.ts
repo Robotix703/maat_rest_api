@@ -3,7 +3,10 @@ import { IUpdateOne } from "../models/mongoose";
 
 import { basePurchase } from "../compute/base/purchase";
 import { baseList } from "../compute/base/list";
-import { IPurchase } from "../models/purchase";
+
+import { computePurchase } from "../compute/computePurchase";
+
+import { IPurchase, ISendPurchaseData } from "../models/purchase";
 import { IList } from "../models/list";
 
 export namespace purchaseController {
@@ -28,6 +31,24 @@ export namespace purchaseController {
       res.status(500).json({
         errorMessage: error
       })
+    });
+  }
+  export async function addPurchase(req: Request, res: Response){
+    let data = req.body as ISendPurchaseData;
+
+    computePurchase.add(data)
+    .then((result: any) => {
+      if(result.status === "OK"){
+        res.status(200).json({status: "OK"});
+      }else{
+        res.status(500).json(result);
+      }
+    })
+    .catch((error: Error) => {
+      res.status(500).json({
+        errorMessage: error
+      })
+      return;
     });
   }
 
