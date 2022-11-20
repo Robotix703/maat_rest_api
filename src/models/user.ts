@@ -5,7 +5,6 @@ export interface IUser {
     number: number
 }
 
-
 export interface IPrettyUser {
     name: string,
     id: string,
