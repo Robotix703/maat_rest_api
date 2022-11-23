@@ -8,6 +8,7 @@ export const listRoutes = express.Router();
 
 //GET
 listRoutes.get("/", checkAuth, listController.readLists);
+listRoutes.get("/byId", checkAuth, listController.getListById);
 
 //POST
 listRoutes.post("/", checkAuth, listController.writeList);

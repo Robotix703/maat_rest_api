@@ -1,3 +1,5 @@
+import { IPrettyUser } from "./user"
+
 export interface IList {
     _id: string
     name: string
@@ -8,6 +10,19 @@ export interface IList {
     balance1: number
     merged: boolean
 }
+
+export interface IPrettyList {
+    _id: string;
+    name: string;
+    main: boolean;
+    user0: IPrettyUser;
+    user1: IPrettyUser;
+    total0: number;
+    total1: number;
+    balance0: number;
+    balance1: number;
+    merged: boolean;
+  }
   
 const mongoose = require('mongoose');
   

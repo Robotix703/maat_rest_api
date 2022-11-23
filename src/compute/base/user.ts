@@ -20,12 +20,13 @@ export namespace baseUser {
         return User.findOne({ name: name });
     }
 
-    export async function getAllUser(): Promise<IUser[]>{
+    export async function getAllUser(): Promise<IUser[] | void>{
         return User.find();
     }
 
-    export async function getPrettyUsers(): Promise<IPrettyUser[]>{
+    export async function getPrettyUsers(): Promise<IPrettyUser[] | void>{
         const users = await getAllUser();
+        if(!users) return;
 
         const prettyUsers: IPrettyUser[] = [
             {

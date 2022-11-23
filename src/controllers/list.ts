@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { IUpdateOne } from "../models/mongoose";
 
-import { IList } from "../models/list";
+import { IList, IPrettyList } from "../models/list";
 import { baseList } from "../compute/base/list";
+import { computeList } from "../compute/computeList";
 
 export namespace listController {
   //POST
@@ -49,6 +50,18 @@ export namespace listController {
       count: count
     }
     res.status(200).json(data);
+  }
+  export async function getListById(req: any, res: Response){
+    computeList.getPrettyListById(req.query.listId)
+    .then((result: IPrettyList) => {
+      res.status(201).json(result);
+    })
+    .catch((error: Error) => {
+      res.status(500).json({
+        errorMessage: error
+      })
+      return;
+    });
   }
 
   //PUT

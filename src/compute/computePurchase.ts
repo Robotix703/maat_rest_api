@@ -65,7 +65,8 @@ export namespace computePurchase {
 
     export async function computePurchase(data: ISendPurchaseData) : Promise<IPurchase | null> {
 
-        const prettyUser: IPrettyUser[] = await baseUser.getPrettyUsers();
+        const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
+        if(!prettyUser) throw new Error("Users not found");
 
         let total0 = 0;
         let total1 = 0;
