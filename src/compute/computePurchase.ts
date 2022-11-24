@@ -2,9 +2,10 @@ import { baseList } from "./base/list";
 import { baseUser } from "./base/user";
 import { basePurchase } from "./base/purchase";
 
-import { IPurchase, ISendPurchaseData } from "../models/purchase";
+import { IPrettyPurchase, IPurchase, ISendPurchaseData } from "../models/purchase";
 import { IUpdateOne } from "../models/mongoose";
 import { IPrettyUser } from "../models/user";
+import { IList } from "../models/list";
 
 export namespace computePurchase {
 
@@ -114,5 +115,45 @@ export namespace computePurchase {
         }
 
         return newPurchase;
+    }
+
+    export async function getPurchasesByListId(listId: string) : Promise<IPrettyPurchase[]>{
+        let purchases: IPurchase[] | void = await basePurchase.getPurchasesByListId(listId);
+        if(!purchases) throw new Error("Purchases not found");
+
+        let list: IList | void = await baseList.getListById(listId);
+        if(!list) throw new Error("List not found");
+
+        let users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
+        if(!users) throw new Error("Users not found");
+
+        let prettyPurchases : IPrettyPurchase[] = [];
+
+        for(let purchase of purchases){
+            let prettyBuyTo : string[] = [];
+            for(let user of purchase.buyTo){
+                prettyBuyTo.push(
+                    (users[0].id == user) ? users[0].name : users[1].name
+                );
+            }
+
+            prettyPurchases.push({
+                _id: purchase._id,
+                title: purchase.title,
+                list: list,
+                amount: purchase.amount,
+                date: purchase.date,
+                buyTo: prettyBuyTo,
+                from: (users[0].id == purchase.from) ? users[0].name : users[1].name,
+                user0: (users[0].number == 0) ? users[0] : users[1],
+                user1: (users[0].number == 0) ? users[0] : users[1],
+                total0: purchase.total0,
+                total1: purchase.total1,
+                balance0: purchase.balance0,
+                balance1: purchase.balance1
+            });
+        }
+
+        return prettyPurchases;
     }
 }

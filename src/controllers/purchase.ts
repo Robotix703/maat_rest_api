@@ -6,7 +6,7 @@ import { baseList } from "../compute/base/list";
 
 import { computePurchase } from "../compute/computePurchase";
 
-import { IPurchase, ISendPurchaseData } from "../models/purchase";
+import { IPrettyPurchase, ISendPurchaseData } from "../models/purchase";
 import { IList } from "../models/list";
 
 export namespace purchaseController {
@@ -67,34 +67,16 @@ export namespace purchaseController {
       return;
     }
 
-    let fetchedPurchases: IPurchase[] | void = await basePurchase.getPurchasesByListId(req.query.listId)
+    computePurchase.getPurchasesByListId(req.query.listId)
+    .then((result: IPrettyPurchase[]) => {
+      res.status(200).json(result);
+    })
     .catch((error: Error) => {
       res.status(500).json({
         errorMessage: error
       });
       return;
     });
-
-    let list: IList | void = await baseList.getListById(req.query.listId)
-    .catch((error: Error) => {
-      res.status(500).json({
-        errorMessage: error
-      })
-      return;
-    });
-
-    if(!list){
-      res.status(500).json({
-        errorMessage: "List id not found"
-      });
-      return;
-    }
-
-    let data = {
-      listName: list.name,
-      purchases: fetchedPurchases
-    }
-    res.status(200).json(data);
   }
 
   //PUT
