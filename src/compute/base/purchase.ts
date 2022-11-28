@@ -8,6 +8,10 @@ export namespace basePurchase {
         return Purchase.find({listId: listId});
     }
 
+    export async function getPurchase(purchaseId: string) : Promise<IPurchase>{
+        return Purchase.findOne({_id: purchaseId});
+    }
+
     export async function register(
         title: string,
         amount: number,

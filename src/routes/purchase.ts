@@ -8,6 +8,7 @@ export const purchaseRoutes = express.Router();
 
 //GET
 purchaseRoutes.get("/", checkAuth, purchaseController.readPurchases);
+purchaseRoutes.get("/byPurchaseId", checkAuth, purchaseController.readPurchase);
 
 //POST
 purchaseRoutes.post("/", checkAuth, purchaseController.writePurchase);

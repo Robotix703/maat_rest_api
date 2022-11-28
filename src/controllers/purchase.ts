@@ -78,6 +78,25 @@ export namespace purchaseController {
       return;
     });
   }
+  export async function readPurchase(req: any, res: Response){
+    if(!req.query.purchaseId){
+      res.status(500).json({
+        errorMessage: "No purchaseId provided"
+      });
+      return;
+    }
+
+    computePurchase.getPurchasesByPurchaseId(req.query.purchaseId)
+    .then((result: IPrettyPurchase) => {
+      res.status(200).json(result);
+    })
+    .catch((error: Error) => {
+      res.status(500).json({
+        errorMessage: error
+      });
+      return;
+    });
+  }
 
   //PUT
   export async function updatePurchase(req: Request, res: Response){
