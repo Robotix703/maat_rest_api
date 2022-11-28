@@ -183,7 +183,7 @@ export namespace computePurchase {
             buyTo: prettyBuyTo,
             from: (users[0].id == purchase.from) ? users[0].name : users[1].name,
             user0: (users[0].number == 0) ? users[0] : users[1],
-            user1: (users[0].number == 0) ? users[0] : users[1],
+            user1: (users[1].number == 1) ? users[1] : users[0],
             total0: purchase.total0,
             total1: purchase.total1,
             balance0: purchase.balance0,
