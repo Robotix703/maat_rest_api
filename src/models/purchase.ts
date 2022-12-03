@@ -6,8 +6,8 @@ export interface IPurchase {
     title: string
     amount: number
     date: Date
-    buyTo: string[]
-    from: string
+    buyTo: IUserName[]
+    from: IUserName
     listId: string
     total0: number
     total1: number
@@ -15,12 +15,23 @@ export interface IPurchase {
     balance1: number
 }
 
+export type IUserID = String;
+export type IUserName = string;
+
 export interface ISendPurchaseData {
     title: string
     amount: number
-    buyTo: string[]
-    from: string
+    buyTo: IUserID[]
+    from: IUserID
     listId: string
+}
+
+export interface IPrettyUpdatePurchase {
+    id: string
+    title: string
+    amount: number
+    buyTo: IUserName[]
+    from: IUserName
 }
 
 export interface IPrettyPurchase {
@@ -29,8 +40,8 @@ export interface IPrettyPurchase {
     list: IList
     amount: number
     date: Date
-    buyTo: string[]
-    from: string
+    buyTo: IUserName[]
+    from: IUserName
     user0: IPrettyUser
     user1: IPrettyUser
     total0: number

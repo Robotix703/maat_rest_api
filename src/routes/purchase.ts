@@ -16,6 +16,7 @@ purchaseRoutes.post("/add", checkAuth, purchaseController.addPurchase);
 
 //PUT
 purchaseRoutes.put("/:id", checkAuth, purchaseController.updatePurchase);
+purchaseRoutes.put("/pretty/:id", checkAuth, purchaseController.updatePrettyPurchase);
 
 //DELETE
 purchaseRoutes.delete("/:id", checkAuth, purchaseController.deletePurchase);

@@ -2,23 +2,73 @@ import { baseList } from "./base/list";
 import { baseUser } from "./base/user";
 import { basePurchase } from "./base/purchase";
 
-import { IPrettyPurchase, IPurchase, ISendPurchaseData } from "../models/purchase";
+import { IPrettyPurchase, IPrettyUpdatePurchase, IPurchase, ISendPurchaseData, IUserID, IUserName } from "../models/purchase";
 import { IUpdateOne } from "../models/mongoose";
 import { IPrettyUser } from "../models/user";
 import { IList } from "../models/list";
 
 export namespace computePurchase {
 
-    export async function add(data: ISendPurchaseData){
+    interface IBalance {
+        balance0: number
+        balance1: number
+    }
 
+    interface ITotals {
+        total0: number
+        total1: number
+    }
+
+    function UserNameToUserId(user : IUserName, users: IPrettyUser[]): IUserID {
+        return (user === users[0].name) ? users[0].id : users[1].id;
+    }
+
+    function UserIdToUserName(user : IUserID, users: IPrettyUser[]): IUserName {
+        return (user === users[0].id) ? users[0].name : users[1].name;
+    }
+
+    function attribute(from: IUserName, users: IPrettyUser[], amount: number) : ITotals {
+        let result : ITotals = {total0: 0, total1: 0};
+
+        (from === users[0].name.toString()) ? result.total0 = amount : result.total1 = amount;
+
+        return result;
+    }
+
+    function divide(buyTo: IUserName[], from: IUserName, amount: number, users: IPrettyUser[]) : IBalance {
+        let result : IBalance = {balance0: 0, balance1: 0};
+        if(buyTo.length == 1){
+            //Buy for himself
+            if(buyTo[0] === from){
+                //Do nothing
+                return null;
+            }
+            //Buy for the seconde one
+            else
+            {
+                //Balance
+                result.balance0 = (from === users[0].name.toString()) ? amount : -amount;
+                result.balance1 = (from === users[1].name.toString()) ? amount : -amount;
+            }
+        }
+        //Divide
+        else
+        {
+            //Balance
+            result.balance0 = (from === users[0].name.toString()) ? amount / 2 : -amount / 2;
+            result.balance1 = (from === users[1].name.toString()) ? amount / 2 : -amount / 2;
+        }
+        return result;
+    }
+
+    export async function add(data: ISendPurchaseData){
         //Compute purchase
         let purchase = await computePurchase(data);
-        if(!purchase){
-            return new Error("Error with purchase");
-        }
+        if(!purchase) return new Error("Error with purchase");
 
         //List
         let list = await baseList.getListById(data.listId);
+        if(!list) return new Error("Error with list");
 
         //Update list
         list.balance0 += purchase.balance0;
@@ -65,55 +115,28 @@ export namespace computePurchase {
     }
 
     export async function computePurchase(data: ISendPurchaseData) : Promise<IPurchase | null> {
-
         const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!prettyUser) throw new Error("Users not found");
 
-        let total0 = 0;
-        let total1 = 0;
-        let balance0 = 0;
-        let balance1 = 0;
+        let convertedFrom = UserIdToUserName(data.from, prettyUser);
+        let convertedBuyTo = [UserIdToUserName(data.buyTo[0], prettyUser), UserIdToUserName(data.buyTo[1], prettyUser)]
 
-        //Alone
-        if(data.buyTo.length == 1){
-            //Buy for himself
-            if(data.buyTo[0] === data.from){
-                //Do nothing
-                return null;
-            }
-            //Buy for the seconde one
-            else
-            {
-                //Balance
-                balance0 = (data.from === prettyUser[0].id.toString()) ? data.amount : -data.amount;
-                balance1 = (data.from === prettyUser[1].id.toString()) ? data.amount : -data.amount;
-            }
-        }
-        //Divide
-        else
-        {
-            //Balance
-            balance0 = (data.from === prettyUser[0].id.toString()) ? data.amount / 2 : -data.amount / 2;
-            balance1 = (data.from === prettyUser[1].id.toString()) ? data.amount / 2 : -data.amount / 2;
-        }
-
-        //Total
-        (data.from === prettyUser[0].id.toString()) ? total0 = data.amount : total1 = data.amount;
+        let totals: ITotals = attribute(convertedFrom, prettyUser, data.amount);
+        let balance: IBalance = divide(convertedBuyTo, convertedFrom, data.amount, prettyUser);
 
         const newPurchase: IPurchase = {
             _id: '',
             title: data.title,
             amount: data.amount,
             date: new Date,
-            buyTo: data.buyTo,
-            from: data.from,
+            buyTo: convertedBuyTo,
+            from: convertedFrom,
             listId: data.listId,
-            total0: total0,
-            total1: total1,
-            balance0: balance0,
-            balance1: balance1
+            total0: totals.total0,
+            total1: totals.total1,
+            balance0: balance.balance0,
+            balance1: balance.balance1
         }
-
         return newPurchase;
     }
 
@@ -191,5 +214,61 @@ export namespace computePurchase {
         };
 
         return prettyPurchases;
+    }
+
+    export async function updatePrettyPurchase(data: IPrettyUpdatePurchase) : Promise<IUpdateOne>{
+        //Get Purchase
+        const oldPurchase: IPurchase = await basePurchase.getPurchase(data.id);
+        if(!oldPurchase) throw new Error("Old Purchase not found");
+        
+        //Revert purchase inside List
+        let list: IList = await baseList.getListById(oldPurchase.listId);
+        if(!list) throw new Error("List not found");
+
+        list.balance0 -= oldPurchase.balance0;
+        list.balance1 -= oldPurchase.balance1;
+        list.total0 -= oldPurchase.total0;
+        list.total1 -= oldPurchase.total1;
+
+        //Compute new purchase
+        const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
+        if(!prettyUser) throw new Error("Users not found");
+
+        let totals: ITotals = attribute(data.from, prettyUser, data.amount);
+        let balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
+
+        //Register new purchase
+        let update = await basePurchase.update(
+            data.id,
+            data.title,
+            data.amount,
+            oldPurchase.date,
+            data.buyTo,
+            data.from,
+            oldPurchase.listId,
+            totals.total0,
+            totals.total1,
+            balance.balance0,
+            balance.balance1
+        );
+        if(!update.acknowledged) throw new Error("Update went wrong");
+
+        //Apply new purchase on list
+        return baseList.update(
+            list._id,
+            list.name,
+            list.main,
+            list.total0,
+            list.total1,
+            list.balance0,
+            list.balance1,
+            list.merged
+        )
+        .then((result: IUpdateOne) => {
+            return result;
+        })
+        .catch((error: Error) => {
+            throw error;
+        });
     }
 }

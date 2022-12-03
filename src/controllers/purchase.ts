@@ -127,6 +127,27 @@ export namespace purchaseController {
       })
     });
   }
+  export async function updatePrettyPurchase(req: Request, res: Response){
+    computePurchase.updatePrettyPurchase({
+      id: req.params.id,
+      title: req.body.title,
+      amount: req.body.amount,
+      buyTo: JSON.parse(req.body.buyTo),
+      from: req.body.from
+    })
+    .then((result: IUpdateOne) => {
+      if (result.modifiedCount > 0) {
+        res.status(200).json({status: "OK"});
+      } else {
+        res.status(401).json({ message: "Pas de modification" });
+      }
+    })
+    .catch((error: Error) => {
+      res.status(500).json({
+        errorMessage: error
+      })
+    });
+  }
 
   //DELETE
   export async function deletePurchase(req: Request, res: Response){

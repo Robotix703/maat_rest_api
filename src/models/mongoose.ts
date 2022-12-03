@@ -1,7 +1,6 @@
 export interface IUpdateOne {
-    n: number;
     modifiedCount: number;
-    ok: number;
+    acknowledged: boolean;
 }
 
 export interface IDeleteOne {
