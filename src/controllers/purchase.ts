@@ -132,7 +132,7 @@ export namespace purchaseController {
       id: req.params.id,
       title: req.body.title,
       amount: req.body.amount,
-      buyTo: JSON.parse(req.body.buyTo),
+      buyTo: req.body.buyTo,
       from: req.body.from
     })
     .then((result: IUpdateOne) => {
@@ -144,7 +144,7 @@ export namespace purchaseController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
     });
   }
@@ -161,7 +161,7 @@ export namespace purchaseController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
     });
   }

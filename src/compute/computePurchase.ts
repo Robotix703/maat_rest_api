@@ -220,11 +220,11 @@ export namespace computePurchase {
         //Get Purchase
         const oldPurchase: IPurchase = await basePurchase.getPurchase(data.id);
         if(!oldPurchase) throw new Error("Old Purchase not found");
-        
+
         //Revert purchase inside List
         let list: IList = await baseList.getListById(oldPurchase.listId);
         if(!list) throw new Error("List not found");
-
+        
         list.balance0 -= oldPurchase.balance0;
         list.balance1 -= oldPurchase.balance1;
         list.total0 -= oldPurchase.total0;
@@ -233,9 +233,10 @@ export namespace computePurchase {
         //Compute new purchase
         const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!prettyUser) throw new Error("Users not found");
-
+        
         let totals: ITotals = attribute(data.from, prettyUser, data.amount);
         let balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
+        if(!balance) throw new Error("From is buyTo");
 
         //Register new purchase
         let update = await basePurchase.update(
