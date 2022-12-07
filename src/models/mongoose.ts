@@ -12,3 +12,7 @@ export interface IDeleteOne {
 export interface ISave {
     err: Error
 }
+
+export interface IStatus {
+    status: string;
+}

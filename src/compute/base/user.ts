@@ -1,30 +1,26 @@
 import User, { IPrettyUser, IUser } from "../../models/user";
 
 export namespace baseUser {
-    export async function register(name: string, password: string, number: number) : Promise<any> {
-
-        if(number < 0 || number > 1){
-            return {errors: "Wrong number"};
-        }
+    export async function register(name: string, password: string, number: number) : Promise<IUser | Error> {
+        if(number < 0 || number > 1) return new Error("Wrong number");
 
         const user = new User({
             name: name,
             password: password,
             number: number
-        })
-
+        });
         return user.save();
     }
 
-    export async function getByName(name : string) : Promise<IUser> {
+    export async function getByName(name : string) : Promise<IUser | null> {
         return User.findOne({ name: name });
     }
 
-    export async function getAllUser(): Promise<IUser[] | void>{
+    export async function getAllUser(): Promise<IUser[] | null>{
         return User.find();
     }
 
-    export async function getPrettyUsers(): Promise<IPrettyUser[] | void>{
+    export async function getPrettyUsers(): Promise<IPrettyUser[] | null>{
         const users = await getAllUser();
         if(!users) return;
 

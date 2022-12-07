@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { IUpdateOne } from "../models/mongoose";
-
+import { IDeleteOne, IUpdateOne } from "../models/mongoose";
 import { IList, IPrettyList } from "../models/list";
+
 import { baseList } from "../compute/base/list";
 import { computeList } from "../compute/computeList";
 
@@ -22,34 +22,33 @@ export namespace listController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
     });
   }
 
   //GET
   export async function readLists(req: any, res: Response){
-    let fetchedLists: IList[] | void = await baseList.getAllLists()
-    .catch((error: Error) => {
+    const fetchedLists: IList[] | void = await baseList.getAllLists();
+    if(!fetchedLists){
       res.status(500).json({
-        errorMessage: error
-      })
+        errorMessage: "List not found"
+      });
       return;
-    });
+    }
 
-    let count = await baseList.count()
-    .catch((error: Error) => {
+    const count = await baseList.count();
+    if(!count){
       res.status(500).json({
-        errorMessage: error
-      })
+        errorMessage: "List count not found"
+      });
       return;
-    });
+    }
     
-    let data = {
+    res.status(200).json({
       lists: fetchedLists,
       count: count
-    }
-    res.status(200).json(data);
+    });
   }
   export async function getListById(req: any, res: Response){
     computeList.getPrettyListById(req.query.listId)
@@ -58,24 +57,22 @@ export namespace listController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
-      return;
     });
   }
 
   //PUT
   export async function updateList(req: Request, res: Response){
-    
     baseList.update(
       req.params.id,
       req.body.name,
-      req.body.main,
+      req.body.main as boolean,
       req.body.total0,
       req.body.total1,
       req.body.balance0,
       req.body.balance1,
-      req.body.merged
+      req.body.merged as boolean
     )
     .then((result: IUpdateOne) => {
       if (result.modifiedCount > 0) {
@@ -86,7 +83,7 @@ export namespace listController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
     });
   }
@@ -94,7 +91,7 @@ export namespace listController {
   //DELETE
   export async function deleteList(req: Request, res: Response){
     baseList.deleteOne(req.params.id)
-    .then((result: any) => {
+    .then((result: IDeleteOne) => {
       if (result.deletedCount > 0) {
         res.status(200).json(result);
       } else {
@@ -103,7 +100,7 @@ export namespace listController {
     })
     .catch((error: Error) => {
       res.status(500).json({
-        errorMessage: error
+        errorMessage: error.message
       })
     });
   }

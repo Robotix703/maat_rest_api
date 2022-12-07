@@ -3,7 +3,7 @@ import { baseUser } from "./base/user";
 import { basePurchase } from "./base/purchase";
 
 import { IPrettyPurchase, IPrettyUpdatePurchase, IPurchase, ISendPurchaseData, IUserID, IUserName } from "../models/purchase";
-import { IUpdateOne } from "../models/mongoose";
+import { IStatus, IUpdateOne } from "../models/mongoose";
 import { IPrettyUser } from "../models/user";
 import { IList } from "../models/list";
 
@@ -31,7 +31,6 @@ export namespace computePurchase {
         let result : ITotals = {total0: 0, total1: 0};
 
         (from === users[0].name.toString()) ? result.total0 = amount : result.total1 = amount;
-
         return result;
     }
 
@@ -39,10 +38,7 @@ export namespace computePurchase {
         let result : IBalance = {balance0: 0, balance1: 0};
         if(buyTo.length == 1){
             //Buy for himself
-            if(buyTo[0] === from){
-                //Do nothing
-                return null;
-            }
+            if(buyTo[0] === from) return null;
             //Buy for the seconde one
             else
             {
@@ -61,9 +57,9 @@ export namespace computePurchase {
         return result;
     }
 
-    export async function add(data: ISendPurchaseData){
+    export async function add(data: ISendPurchaseData) : Promise<IStatus | Error>{
         //Compute purchase
-        let purchase = await computePurchase(data);
+        const purchase = await computePurchase(data);
         if(!purchase) return new Error("Error with purchase");
 
         //List
@@ -89,7 +85,7 @@ export namespace computePurchase {
             purchase.balance0,
             purchase.balance1
         )
-        .then((result: any) => {
+        .then((result: IPurchase) => {
             //Update List
             return baseList.updateTotalAndBalance(
                 data.listId,
@@ -99,18 +95,15 @@ export namespace computePurchase {
                 list.balance1
             )
             .then((result: IUpdateOne) => {
-                if (result.modifiedCount > 0) {
-                  return {status: "OK"};
-                } else {
-                  return new Error("Error when updating list");
-                }
+                if (result.modifiedCount > 0) return {status: "OK"};
+                else return new Error("Error when updating list");
             })
             .catch((error: Error) => {
-                return error;
+                throw error;
             });
         })
         .catch((error: Error) => {
-            return error;
+            throw error;
         });
     }
 
@@ -118,8 +111,8 @@ export namespace computePurchase {
         const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!prettyUser) throw new Error("Users not found");
 
-        let convertedFrom = UserIdToUserName(data.from, prettyUser);
-        let convertedBuyTo = [UserIdToUserName(data.buyTo[0], prettyUser), UserIdToUserName(data.buyTo[1], prettyUser)]
+        const convertedFrom = UserIdToUserName(data.from, prettyUser);
+        const convertedBuyTo = [UserIdToUserName(data.buyTo[0], prettyUser), UserIdToUserName(data.buyTo[1], prettyUser)]
 
         let totals: ITotals = attribute(convertedFrom, prettyUser, data.amount);
         let balance: IBalance = divide(convertedBuyTo, convertedFrom, data.amount, prettyUser);
@@ -141,13 +134,13 @@ export namespace computePurchase {
     }
 
     export async function getPurchasesByListId(listId: string) : Promise<IPrettyPurchase[]>{
-        let purchases: IPurchase[] | void = await basePurchase.getPurchasesByListId(listId);
+        const purchases: IPurchase[] | void = await basePurchase.getPurchasesByListId(listId);
         if(!purchases) throw new Error("Purchases not found");
 
-        let list: IList | void = await baseList.getListById(listId);
+        const list: IList | void = await baseList.getListById(listId);
         if(!list) throw new Error("List not found");
 
-        let users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
+        const users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!users) throw new Error("Users not found");
 
         let prettyPurchases : IPrettyPurchase[] = [];
@@ -181,13 +174,13 @@ export namespace computePurchase {
     }
 
     export async function getPurchasesByPurchaseId(purchaseId: string) : Promise<IPrettyPurchase>{
-        let purchase: IPurchase | void = await basePurchase.getPurchase(purchaseId);
+        const purchase: IPurchase | void = await basePurchase.getPurchase(purchaseId);
         if(!purchase) throw new Error("Purchases not found");
 
-        let list: IList | void = await baseList.getListById(purchase.listId);
+        const list: IList | void = await baseList.getListById(purchase.listId);
         if(!list) throw new Error("List not found");
 
-        let users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
+        const users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!users) throw new Error("Users not found");
 
         let prettyBuyTo : string[] = [];
@@ -212,7 +205,6 @@ export namespace computePurchase {
             balance0: purchase.balance0,
             balance1: purchase.balance1
         };
-
         return prettyPurchases;
     }
 
@@ -234,8 +226,8 @@ export namespace computePurchase {
         const prettyUser: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!prettyUser) throw new Error("Users not found");
         
-        let totals: ITotals = attribute(data.from, prettyUser, data.amount);
-        let balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
+        const totals: ITotals = attribute(data.from, prettyUser, data.amount);
+        const balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
         if(!balance) throw new Error("From is buyTo");
 
         //Register new purchase

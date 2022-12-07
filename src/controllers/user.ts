@@ -19,8 +19,13 @@ export namespace userController {
   
     bcrypt.hash(req.body.password, 10).then((hash: string) => {
       baseUser.register(req.body.name, hash, req.body.userNumber)
-        .then((result: any) => {
-          if(result.errors) throw result;
+        .then((result: IUser) => {
+          if(!result) {
+            res.status(500).json({
+              message: "Wrong invitation code"
+            });
+            return;
+          };
 
           baseUser.getByName(req.body.name)
           .then((user: IUser) => { 
@@ -41,11 +46,11 @@ export namespace userController {
               number: user.number,
               name: user.name
             });
-          })
+          });
         })
-        .catch((error: any) => {
+        .catch((error: Error) => {
           res.status(500).json({
-            error: error
+            error: error.message
           });
         });
     });
@@ -59,16 +64,18 @@ export namespace userController {
       fetchUser = user;
   
       if (!user) {
-        return res.status(401).json({
+        res.status(401).json({
           message: "Mauvaise Email"
         });
+        return;
       }
       bcrypt.compare(req.body.password, user.password)
-      .then((result: any) => {
+      .then((result: boolean) => {
         if (!result) {
-          return res.status(401).json({
+          res.status(401).json({
             message: "Mauvaise Mot de passe"
           });
+          return;
         }
   
         const token = jwt.sign(
@@ -91,20 +98,20 @@ export namespace userController {
       })
     })
     .catch((error: Error) => {
-      return res.status(401).json({
-        errorMessage: error
+      res.status(401).json({
+        errorMessage: error.message
       });
     });
   }
 
   export function getAllUser(req: Request, res: Response){
     baseUser.getPrettyUsers()
-    .then(data => {
+    .then((data: IPrettyUser[]) => {
       res.status(200).json(data);
     })
     .catch((error: Error) => {
       return res.status(401).json({
-        errorMessage: error
+        errorMessage: error.message
       });
     });
   }

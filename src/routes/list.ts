@@ -1,8 +1,7 @@
 import express from "express";
+import checkAuth from "../middleware/check-auth";
 
 import { listController } from "../controllers/list";
-
-import checkAuth from "../middleware/check-auth";
 
 export const listRoutes = express.Router();
 

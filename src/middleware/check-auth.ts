@@ -2,7 +2,6 @@ import { Response } from "express";
 import { BackendError, errorTypes } from "../error/backendError";
 import Jwt from "jsonwebtoken";
 
-
 export default function (req: any, res: Response, next: any) {
     try{
         if(!req.headers.authorization){

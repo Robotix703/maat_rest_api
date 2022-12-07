@@ -4,11 +4,11 @@ import { IDeleteOne, IUpdateOne } from '../../models/mongoose';
 
 export namespace basePurchase {
         
-    export async function getPurchasesByListId(listId: string) : Promise<IPurchase[]> {
+    export async function getPurchasesByListId(listId: string) : Promise<IPurchase[] | null> {
         return Purchase.find({listId: listId});
     }
 
-    export async function getPurchase(purchaseId: string) : Promise<IPurchase>{
+    export async function getPurchase(purchaseId: string) : Promise<IPurchase | null>{
         return Purchase.findOne({_id: purchaseId});
     }
 
@@ -23,7 +23,7 @@ export namespace basePurchase {
         total1: number,
         balance0: number,
         balance1: number
-    ) : Promise<any> {
+    ) : Promise<IPurchase | Error> {
         const purchase = new Purchase({
             title: title,
             amount: amount,
@@ -36,13 +36,12 @@ export namespace basePurchase {
             balance0: balance0,
             balance1: balance1
         });
-
         return await purchase.save()
-        .then((result: any) => {
-            return { id: result._id, purchase: purchase };
+        .then((result: IPurchase) => {
+            return { result };
         })
         .catch((error: Error) => {
-            return { error: error };
+            return { error };
         });
     }
     
@@ -75,11 +74,11 @@ export namespace basePurchase {
         return Purchase.updateOne({ _id: _id }, elementToUpdate);
     }
     
-    export async function count() : Promise<number> {
+    export async function count() : Promise<number | null> {
         return Purchase.count();
     }
 
-    export async function deleteOne(id : string) : Promise<IDeleteOne> {
+    export async function deleteOne(id : string) : Promise<IDeleteOne | null> {
         return Purchase.deleteOne({ _id: id })
     }
 }

@@ -5,6 +5,9 @@ import { userController } from "../controllers/user";
 
 export const userRoutes = express.Router();
 
+//GET
+userRoutes.get("/all", checkAuth, userController.getAllUser);
+
+//POST
 userRoutes.post("/signup", userController.createUser);
 userRoutes.post("/login", userController.userLogin);
-userRoutes.get("/all", checkAuth, userController.getAllUser);

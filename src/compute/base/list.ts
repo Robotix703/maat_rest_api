@@ -3,7 +3,7 @@ import List, { IList } from '../../models/list'
 
 export namespace baseList {
         
-    export async function getAllLists() : Promise<IList[]> {
+    export async function getAllLists() : Promise<IList[] | null> {
         return List.find();
     }
 
@@ -19,7 +19,7 @@ export namespace baseList {
         balance0: number,
         balance1: number, 
         merged: boolean
-    ) : Promise<any> {
+    ) : Promise<IList> {
         const list = new List({
             name: name,
             main: main,
@@ -31,11 +31,11 @@ export namespace baseList {
         });
 
         return await list.save()
-        .then((result: any) => {
-            return { id: result._id, list: list };
+        .then((result: IList) => {
+            return { list };
         })
         .catch((error: Error) => {
-            return { error: error };
+            return { error };
         });
     }
     
@@ -79,11 +79,11 @@ export namespace baseList {
         return List.updateOne({ _id: _id }, elementToUpdate);
     }
     
-    export async function count() : Promise<number> {
+    export async function count() : Promise<number | null> {
         return List.count();
     }
 
-    export async function deleteOne(id : string) : Promise<IDeleteOne> {
+    export async function deleteOne(id : string) : Promise<IDeleteOne | null> {
         return List.deleteOne({ _id: id })
     }
 }

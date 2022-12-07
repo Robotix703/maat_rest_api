@@ -1,8 +1,7 @@
 import express from "express";
+import checkAuth from "../middleware/check-auth";
 
 import { purchaseController } from "../controllers/purchase";
-
-import checkAuth from "../middleware/check-auth";
 
 export const purchaseRoutes = express.Router();
 
