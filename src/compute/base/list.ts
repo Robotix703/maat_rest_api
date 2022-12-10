@@ -78,6 +78,10 @@ export namespace baseList {
 
         return List.updateOne({ _id: _id }, elementToUpdate);
     }
+
+    export async function getMainList(): Promise<IList | null>{
+        return List.findOne({ main: true});
+    }
     
     export async function count() : Promise<number | null> {
         return List.count();

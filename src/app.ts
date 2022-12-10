@@ -19,6 +19,11 @@ BDD.connectToDataBase()
 import { userRoutes } from "./routes/user";
 import { listRoutes } from "./routes/list";
 import { purchaseRoutes } from './routes/purchase';
+import { createMainListIfNeeded, createUserIfNeeded } from './initialization';
+
+//Init
+createUserIfNeeded();
+createMainListIfNeeded();
 
 const app = express();
 

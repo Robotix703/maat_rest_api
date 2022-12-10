@@ -1,3 +1,4 @@
+import { IDeleteOne } from "../../models/mongoose";
 import User, { IPrettyUser, IUser } from "../../models/user";
 
 export namespace baseUser {
@@ -20,6 +21,10 @@ export namespace baseUser {
         return User.find();
     }
 
+    export async function count(): Promise<number | null>{
+        return User.count();
+    }
+
     export async function getPrettyUsers(): Promise<IPrettyUser[] | null>{
         const users = await getAllUser();
         if(!users) return;
@@ -37,5 +42,9 @@ export namespace baseUser {
             }
         ];
         return prettyUsers;
+    }
+
+    export async function deleteAll(): Promise<IDeleteOne>{
+        return User.deleteMany({});
     }
 }
