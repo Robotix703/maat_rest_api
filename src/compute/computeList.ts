@@ -15,7 +15,7 @@ export namespace computeList {
             name: list.name,
             main: list.main,
             user0: (prettyUsers[0].number == 0) ? prettyUsers[0] : prettyUsers[1],
-            user1: (prettyUsers[0].number == 1) ? prettyUsers[1] : prettyUsers[0],
+            user1: (prettyUsers[1].number == 1) ? prettyUsers[1] : prettyUsers[0],
             total0: list.total0,
             total1: list.total1,
             balance0: list.balance0,

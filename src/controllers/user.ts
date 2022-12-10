@@ -65,7 +65,7 @@ export namespace userController {
   
       if (!user) {
         res.status(401).json({
-          message: "Mauvaise Email"
+          message: "Mauvaise Nom"
         });
         return;
       }
