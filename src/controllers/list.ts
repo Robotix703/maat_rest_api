@@ -7,7 +7,7 @@ import { computeList } from "../compute/computeList";
 
 export namespace listController {
   //POST
-  export async function writeList(req: Request, res: Response){
+  export async function writeList(req: any, res: any){
     baseList.register(
       req.body.name,
       req.body.main as boolean,
@@ -17,7 +17,7 @@ export namespace listController {
       req.body.balance1,
       req.body.merged as boolean
     )
-    .then((result: any) => {
+    .then((result: IList) => {
       res.status(201).json(result);
     })
     .catch((error: Error) => {

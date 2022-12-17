@@ -9,12 +9,13 @@
         "sourceMap": true,
         "outDir": "build",
         "baseUrl": ".",
-        "types": ["node"],
+        "types": ["jest", "node"],
         "paths": {
             "*": [
                 "node_modules/*"
             ]
-        }
+        },
+        "skipLibCheck": true
     },
     "include": [
         "src/*",
@@ -24,7 +25,8 @@
         "src/middleware/*",
         "src/controllers/*",
         "src/compute/*",
-        "src/compute/base/*"
+        "src/compute/base/*",
+        "tests/**/*.ts"
     ],
     "exclude": [
         "build/*"
