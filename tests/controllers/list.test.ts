@@ -1,6 +1,8 @@
-import { IList } from "../../src/models/list";
+import { IList, IPrettyList } from "../../src/models/list";
 import { baseList } from "../../src/compute/base/list";
 import { listController } from "../../src/controllers/list";
+import { computeList } from "../../src/compute/computeList";
+import { IPrettyUser } from "../../src/models/user";
 
 
 let list0 : IList = {
@@ -13,6 +15,29 @@ let list0 : IList = {
     balance1: 12,
     merged: false
 };
+let prettyUser0 : IPrettyUser = {
+    name: "userName0",
+    id: "userId0",
+    number: 10
+}
+let prettyUser1 : IPrettyUser = {
+    name: "userName1",
+    id: "userId1",
+    number: 20
+}
+let prettyList0 : IPrettyList = {
+    _id: list0._id,
+    name: list0.name,
+    main: list0.main,
+    user0: prettyUser0,
+    user1: prettyUser1,
+    total0: list0.total0,
+    total1: list0.total1,
+    balance0: list0.balance0,
+    balance1: list0.balance1,
+    merged: list0.merged
+}
+
 let errorMessage : string = 'Async error message';
 let errorObject : object = {
     errorMessage: errorMessage
@@ -233,4 +258,77 @@ test('readLists error count empty', async () => {
 
     getAllLists.mockRestore();
     countSpy.mockRestore();
+});
+
+test('getListById', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        query: {
+            listId: list0._id
+        }
+    }
+
+    let getAllLists = jest.spyOn(computeList, "getPrettyListById").mockResolvedValue(prettyList0);
+    
+    await listController.getListById(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(prettyList0);
+    expect(reponseStatus).toBe(201);
+
+    getAllLists.mockRestore();
+});
+test('getListById error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        query: {
+            listId: list0._id
+        }
+    }
+
+    let getAllLists = jest.spyOn(computeList, "getPrettyListById").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    await listController.getListById(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    getAllLists.mockRestore();
+});
+test('getListById error empty', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        query: {
+            listId: list0._id
+        }
+    }
+
+    let getAllLists = jest.spyOn(computeList, "getPrettyListById").mockResolvedValue(null);
+    await listController.getListById(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({ errorMessage: "No list created" });
+    expect(reponseStatus).toBe(500);
+
+    getAllLists.mockRestore();
 });

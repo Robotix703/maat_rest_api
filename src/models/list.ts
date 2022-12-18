@@ -12,17 +12,17 @@ export interface IList {
 }
 
 export interface IPrettyList {
-    _id: string;
-    name: string;
-    main: boolean;
-    user0: IPrettyUser;
-    user1: IPrettyUser;
-    total0: number;
-    total1: number;
-    balance0: number;
-    balance1: number;
-    merged: boolean;
-  }
+    _id: string
+    name: string
+    main: boolean
+    user0: IPrettyUser
+    user1: IPrettyUser
+    total0: number
+    total1: number
+    balance0: number
+    balance1: number
+    merged: boolean
+}
   
 const mongoose = require('mongoose');
   

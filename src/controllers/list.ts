@@ -56,9 +56,11 @@ export namespace listController {
       count: count
     });
   }
-  export async function getListById(req: any, res: Response){
-    computeList.getPrettyListById(req.query.listId)
+  export async function getListById(req: any, res: any){
+    return computeList.getPrettyListById(req.query.listId)
     .then((result: IPrettyList) => {
+      if(!result) res.status(500).json({ errorMessage: "No list created" });
+      
       res.status(201).json(result);
     })
     .catch((error: Error) => {
