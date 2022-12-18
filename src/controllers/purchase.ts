@@ -76,16 +76,16 @@ export namespace purchaseController {
       });
     });
   }
-  export async function readPurchase(req: any, res: Response){
+  export async function readPurchase(req: any, res: any){
     if(!req.query.purchaseId){
-      res.status(500).json({
-        errorMessage: "No purchaseId provided"
-      });
+      res.status(500).json({errorMessage: "No purchaseId provided"});
       return;
     }
 
-    computePurchase.getPurchasesByPurchaseId(req.query.purchaseId)
+    return computePurchase.getPurchasesByPurchaseId(req.query.purchaseId)
     .then((result: IPrettyPurchase) => {
+      if(!result) res.status(500).json({errorMessage: "No purchase found"});
+
       res.status(200).json(result);
     })
     .catch((error: Error) => {

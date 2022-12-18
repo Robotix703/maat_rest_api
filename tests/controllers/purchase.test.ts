@@ -307,3 +307,71 @@ test('readPurchases error', async () => {
 
     spy.mockRestore();
 });
+
+test('readPurchase', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            purchaseId: purchase0._id
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByPurchaseId").mockResolvedValue(prettyPurchase);
+    
+    await purchaseController.readPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(prettyPurchase);
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('readPurchase empty', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            purchaseId: purchase0.listId
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByPurchaseId").mockResolvedValue(null);
+    
+    await purchaseController.readPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({errorMessage: "No purchase found"});
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+test('readPurchase error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            purchaseId: purchase0.listId
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByPurchaseId").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    await purchaseController.readPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
