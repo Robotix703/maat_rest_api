@@ -71,8 +71,8 @@ export namespace listController {
   }
 
   //PUT
-  export async function updateList(req: Request, res: Response){
-    baseList.update(
+  export async function updateList(req: any, res: any){
+    return baseList.update(
       req.params.id,
       req.body.name,
       req.body.main as boolean,
@@ -86,7 +86,7 @@ export namespace listController {
       if (result.modifiedCount > 0) {
         res.status(200).json({status: "OK"});
       } else {
-        res.status(401).json({ message: "Pas de modification" });
+        res.status(401).json({message: "Pas de modification"});
       }
     })
     .catch((error: Error) => {

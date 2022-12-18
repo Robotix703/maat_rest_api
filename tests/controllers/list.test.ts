@@ -3,6 +3,7 @@ import { baseList } from "../../src/compute/base/list";
 import { listController } from "../../src/controllers/list";
 import { computeList } from "../../src/compute/computeList";
 import { IPrettyUser } from "../../src/models/user";
+import { IUpdateOne } from "../../src/models/mongoose";
 
 
 let list0 : IList = {
@@ -36,6 +37,15 @@ let prettyList0 : IPrettyList = {
     balance0: list0.balance0,
     balance1: list0.balance1,
     merged: list0.merged
+}
+
+let updateOne0 : IUpdateOne = {
+    modifiedCount: 1,
+    acknowledged: true
+}
+let updateOneNoUpdate : IUpdateOne = {
+    modifiedCount: 0,
+    acknowledged: false
 }
 
 let errorMessage : string = 'Async error message';
@@ -331,4 +341,106 @@ test('getListById error empty', async () => {
     expect(reponseStatus).toBe(500);
 
     getAllLists.mockRestore();
+});
+
+test('updateList', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        },
+        body: {
+            name: list0.name,
+            main: list0.main,
+            balance0: list0.balance0,
+            balance1: list0.balance1,
+            merged: list0.merged,
+            total0: list0.total0,
+            total1: list0.total1
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "update").mockResolvedValue(updateOne0);
+    
+    await listController.updateList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({status: "OK"});
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('updateList no change', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        },
+        body: {
+            name: list0.name,
+            main: list0.main,
+            balance0: list0.balance0,
+            balance1: list0.balance1,
+            merged: list0.merged,
+            total0: list0.total0,
+            total1: list0.total1
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "update").mockResolvedValue(updateOneNoUpdate);
+    
+    await listController.updateList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({message: "Pas de modification"});
+    expect(reponseStatus).toBe(401);
+
+    spy.mockRestore();
+});
+test('updateList error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        },
+        body: {
+            name: list0.name,
+            main: list0.main,
+            balance0: list0.balance0,
+            balance1: list0.balance1,
+            merged: list0.merged,
+            total0: list0.total0,
+            total1: list0.total1
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "update").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    
+    await listController.updateList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
 });
