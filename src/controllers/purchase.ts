@@ -9,20 +9,22 @@ import { IPrettyPurchase, IPurchase, ISendPurchaseData } from "../models/purchas
 
 export namespace purchaseController {
   //POST
-  export async function writePurchase(req: Request, res: Response){
-    basePurchase.register(
-        req.body.title,
-        req.body.amount,
-        req.body.date,
-        req.body.buyTo,
-        req.body.from,
-        req.body.listId,
-        req.body.total0,
-        req.body.total1,
-        req.body.balance0,
-        req.body.balance1
+  export async function writePurchase(req: any, res: any){
+    return basePurchase.register(
+      req.body.title,
+      req.body.amount,
+      req.body.date,
+      req.body.buyTo,
+      req.body.from,
+      req.body.listId,
+      req.body.total0,
+      req.body.total1,
+      req.body.balance0,
+      req.body.balance1
     )
-    .then((result: IPurchase | Error) => {
+    .then((result: IPurchase) => {
+      if(!result) res.status(500).json({errorMessage: "No purchase found"});
+
       res.status(201).json(result);
     })
     .catch((error: Error) => {
