@@ -33,7 +33,7 @@ export namespace purchaseController {
       });
     });
   }
-  export async function addPurchase(req: Request, res: Response){
+  export async function addPurchase(req: any, res: any){
     const data : ISendPurchaseData = {
       title: req.body.title,
       amount: req.body.amount,
@@ -42,10 +42,10 @@ export namespace purchaseController {
       listId: req.body.listId
     };
 
-    computePurchase.add(data)
+    return computePurchase.add(data)
     .then((result: IStatus) => {
       if(result.status === "OK"){
-        res.status(200).json({status: "OK"});
+        res.status(200).json(result);
       }else{
         res.status(500).json(result);
       }
