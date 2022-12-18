@@ -3,7 +3,7 @@ import { baseList } from "../../src/compute/base/list";
 import { listController } from "../../src/controllers/list";
 import { computeList } from "../../src/compute/computeList";
 import { IPrettyUser } from "../../src/models/user";
-import { IUpdateOne } from "../../src/models/mongoose";
+import { IDeleteOne, IUpdateOne } from "../../src/models/mongoose";
 
 
 let list0 : IList = {
@@ -46,6 +46,17 @@ let updateOne0 : IUpdateOne = {
 let updateOneNoUpdate : IUpdateOne = {
     modifiedCount: 0,
     acknowledged: false
+}
+
+let deleteOne0 : IDeleteOne = {
+    n: 1,
+    deletedCount: 1,
+    ok: 1
+}
+let deleteNoOne : IDeleteOne = {
+    n: 0,
+    deletedCount: 0,
+    ok: 0
 }
 
 let errorMessage : string = 'Async error message';
@@ -435,6 +446,81 @@ test('updateList error', async () => {
     );
     
     await listController.updateList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+
+test('deleteList', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "deleteOne").mockResolvedValue(deleteOne0);
+    
+    await listController.deleteList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toBe(deleteOne0);
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('deleteList no deleted', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "deleteOne").mockResolvedValue(deleteNoOne);
+    
+    await listController.deleteList(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({errorMessage: "No modification"});
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+test('deleteList error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(baseList, "deleteOne").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    
+    await listController.deleteList(mockRequest, mockResponse);
 
     let responseBody = mockResponse.status().json.mock.calls[0][0];
     let reponseStatus = mockStatusCode.mock.calls[0][0];

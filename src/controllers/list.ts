@@ -97,13 +97,13 @@ export namespace listController {
   }
 
   //DELETE
-  export async function deleteList(req: Request, res: Response){
-    baseList.deleteOne(req.params.id)
+  export async function deleteList(req: any, res: any){
+    return baseList.deleteOne(req.params.id)
     .then((result: IDeleteOne) => {
       if (result.deletedCount > 0) {
         res.status(200).json(result);
       } else {
-        res.status(500).json(result);
+        res.status(500).json({errorMessage: "No modification"});
       }
     })
     .catch((error: Error) => {
