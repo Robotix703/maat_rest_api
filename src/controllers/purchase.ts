@@ -58,16 +58,16 @@ export namespace purchaseController {
   }
 
   //GET
-  export async function readPurchases(req: any, res: Response){
+  export async function readPurchases(req: any, res: any){
     if(!req.query.listId){
-      res.status(500).json({
-        errorMessage: "No listId provided"
-      });
+      res.status(500).json({errorMessage: "No listId provided"});
       return;
     }
 
-    computePurchase.getPurchasesByListId(req.query.listId)
+    return computePurchase.getPurchasesByListId(req.query.listId)
     .then((result: IPrettyPurchase[]) => {
+      if(!result) res.status(500).json({errorMessage: "No purchase found"});
+
       res.status(200).json(result);
     })
     .catch((error: Error) => {

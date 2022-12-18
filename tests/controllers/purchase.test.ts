@@ -1,8 +1,10 @@
-import { IPurchase } from "../../src/models/purchase";
+import { IPrettyPurchase, IPurchase } from "../../src/models/purchase";
 import { basePurchase } from "../../src/compute/base/purchase";
 import { purchaseController } from "../../src/controllers/purchase";
 import { computePurchase } from "../../src/compute/computePurchase";
 import { IStatus } from "../../src/models/mongoose";
+import { IPrettyUser } from "../../src/models/user";
+import { IList } from "../../src/models/list";
 
 
 let purchase0 : IPurchase = {
@@ -17,6 +19,41 @@ let purchase0 : IPurchase = {
     total1: 12,
     balance0: 13,
     balance1: 14
+}
+let prettyUser0 : IPrettyUser = {
+    name: "userName0",
+    id: "userId0",
+    number: 10
+}
+let prettyUser1 : IPrettyUser = {
+    name: "userName1",
+    id: "userId1",
+    number: 20
+}
+let list0 : IList = {
+    _id: "_id",
+    name: "listName",
+    main: true,
+    total0: 10,
+    total1: 11,
+    balance0: 12,
+    balance1: 13,
+    merged: true
+}
+let prettyPurchase : IPrettyPurchase = {
+    _id: "_id",
+    title: "purchaseTitle",
+    amount: 10,
+    date: new Date(),
+    buyTo: ["user0", "user1"],
+    from: "user0",
+    list: list0,
+    total0: 11,
+    total1: 12,
+    balance0: 13,
+    balance1: 14,
+    user0: prettyUser0,
+    user1: prettyUser1
 }
 
 let statusOK : IStatus = {status: "OK"};
@@ -193,6 +230,74 @@ test('addPurchase error', async () => {
     );
     
     await purchaseController.addPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+
+test('readPurchases', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            listId: purchase0.listId
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByListId").mockResolvedValue([prettyPurchase]);
+    
+    await purchaseController.readPurchases(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject([prettyPurchase]);
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('readPurchases empty', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            listId: purchase0.listId
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByListId").mockResolvedValue(null);
+    
+    await purchaseController.readPurchases(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({errorMessage: "No purchase found"});
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+test('readPurchases error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        query: {
+            listId: purchase0.listId
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "getPurchasesByListId").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    await purchaseController.readPurchases(mockRequest, mockResponse);
 
     let responseBody = mockResponse.status().json.mock.calls[0][0];
     let reponseStatus = mockStatusCode.mock.calls[0][0];
