@@ -8,7 +8,7 @@ import { computeList } from "../compute/computeList";
 export namespace listController {
   //POST
   export async function writeList(req: any, res: any){
-    baseList.register(
+    return baseList.register(
       req.body.name,
       req.body.main as boolean,
       req.body.total0,
@@ -18,12 +18,14 @@ export namespace listController {
       req.body.merged as boolean
     )
     .then((result: IList) => {
+      if(!result) res.status(500).json({ errorMessage: "No list created" });
+
       res.status(201).json(result);
     })
     .catch((error: Error) => {
       res.status(500).json({
         errorMessage: error.message
-      })
+      });
     });
   }
 
