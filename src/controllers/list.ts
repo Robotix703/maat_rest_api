@@ -30,20 +30,24 @@ export namespace listController {
   }
 
   //GET
-  export async function readLists(req: any, res: Response){
-    const fetchedLists: IList[] | void = await baseList.getAllLists();
+  export async function readLists(req: any, res: any){
+    const fetchedLists: IList[] | void = await baseList.getAllLists()
+    .catch(error => {
+      res.status(500).json({ errorMessage: error.message });
+      return;
+    });
     if(!fetchedLists){
-      res.status(500).json({
-        errorMessage: "List not found"
-      });
+      res.status(500).json({ errorMessage: "List not found" });
       return;
     }
 
-    const count = await baseList.count();
+    const count = await baseList.count()
+    .catch(error => {
+      res.status(500).json({ errorMessage: error.message });
+      return;
+    });
     if(!count){
-      res.status(500).json({
-        errorMessage: "List count not found"
-      });
+      res.status(500).json({ errorMessage: "List count not found" });
       return;
     }
     
