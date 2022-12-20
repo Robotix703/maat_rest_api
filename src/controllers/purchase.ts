@@ -118,8 +118,8 @@ export namespace purchaseController {
       res.status(500).json({errorMessage: error.message});
     });
   }
-  export async function updatePrettyPurchase(req: Request, res: Response){
-    computePurchase.updatePrettyPurchase({
+  export async function updatePrettyPurchase(req: any, res: any){
+    return computePurchase.updatePrettyPurchase({
       id: req.params.id,
       title: req.body.title,
       amount: req.body.amount,
@@ -131,9 +131,7 @@ export namespace purchaseController {
       else res.status(401).json({ message: "Pas de modification" });
     })
     .catch((error: Error) => {
-      res.status(500).json({
-        errorMessage: error.message
-      })
+      res.status(500).json({errorMessage: error.message});
     });
   }
 

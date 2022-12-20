@@ -490,3 +490,96 @@ test('updatePurchase error', async () => {
 
     spy.mockRestore();
 });
+
+test('updatePrettyPurchase', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        body: {
+            title: purchase0.title,
+            amount: purchase0.amount,
+            buyTo: purchase0.buyTo,
+            from: purchase0.from
+        },
+        params: {
+            id: purchase0._id
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "updatePrettyPurchase").mockResolvedValue(updateOne0);
+    
+    await purchaseController.updatePrettyPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(statusOK);
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('updatePrettyPurchase not update', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        body: {
+            title: purchase0.title,
+            amount: purchase0.amount,
+            buyTo: purchase0.buyTo,
+            from: purchase0.from
+        },
+        params: {
+            id: purchase0._id
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "updatePrettyPurchase").mockResolvedValue(updateOneNotUpdate);
+    
+    await purchaseController.updatePrettyPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(statusNotUpdated);
+    expect(reponseStatus).toBe(401);
+
+    spy.mockRestore();
+});
+test('updatePrettyPurchase error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {status : mockStatusCode.mockReturnValue({json: jest.fn()})}
+
+    let mockRequest = {
+        body: {
+            title: purchase0.title,
+            amount: purchase0.amount,
+            date: purchase0.date,
+            buyTo: purchase0.buyTo,
+            from: purchase0.from,
+            listId: purchase0.listId,
+            total0: purchase0.total0,
+            total1: purchase0.total1,
+            balance0: purchase0.balance0,
+            balance1: purchase0.balance1
+        },
+        params: {
+            id: purchase0._id
+        }
+    };
+
+    let spy = jest.spyOn(computePurchase, "updatePrettyPurchase").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    
+    await purchaseController.updatePrettyPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
