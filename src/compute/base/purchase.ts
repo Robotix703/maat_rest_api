@@ -2,8 +2,7 @@ import Purchase, { IPurchase } from '../../models/purchase';
 import { IDeleteOne, IUpdateOne } from '../../models/mongoose';
 
 
-export namespace basePurchase {
-        
+export namespace basePurchase {   
     export async function getPurchasesByListId(listId: string) : Promise<IPurchase[] | null> {
         return Purchase.find({listId: listId});
     }

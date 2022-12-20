@@ -98,7 +98,6 @@ test('count', async () => {
 });
 
 test('deleteOne', async () => {
-
     mockingoose(List).toReturn("OK", 'deleteOne');
 
     let result = await baseList.deleteOne(list._id);
