@@ -96,8 +96,8 @@ export namespace purchaseController {
   }
 
   //PUT
-  export async function updatePurchase(req: Request, res: Response){
-    basePurchase.update(
+  export async function updatePurchase(req: any, res: any){
+    return basePurchase.update(
       req.params.id,
       req.body.title,
       req.body.amount,
@@ -115,9 +115,7 @@ export namespace purchaseController {
       else res.status(401).json({message: "Pas de modification"});
     })
     .catch((error: Error) => {
-      res.status(500).json({
-        errorMessage: error.message
-      })
+      res.status(500).json({errorMessage: error.message});
     });
   }
   export async function updatePrettyPurchase(req: Request, res: Response){
