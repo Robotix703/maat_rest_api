@@ -2,7 +2,7 @@ import { IPrettyPurchase, IPurchase } from "../../src/models/purchase";
 import { basePurchase } from "../../src/compute/base/purchase";
 import { purchaseController } from "../../src/controllers/purchase";
 import { computePurchase } from "../../src/compute/computePurchase";
-import { IStatus } from "../../src/models/mongoose";
+import { IDeleteOne, IStatus } from "../../src/models/mongoose";
 import { IPrettyUser } from "../../src/models/user";
 import { IList } from "../../src/models/list";
 import { IUpdateOne } from "../../src/models/mongoose";
@@ -63,6 +63,17 @@ let updateOne0 : IUpdateOne = {
 let updateOneNotUpdate : IUpdateOne = {
     modifiedCount: 0,
     acknowledged: false
+}
+
+let deleteOne0 : IDeleteOne = {
+    n: 1,
+    deletedCount: 1,
+    ok: 1
+}
+let deleteNoOne : IDeleteOne = {
+    n: 0,
+    deletedCount: 0,
+    ok: 0
 }
 
 let statusOK : IStatus = {status: "OK"};
@@ -574,6 +585,81 @@ test('updatePrettyPurchase error', async () => {
     );
     
     await purchaseController.updatePrettyPurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject(errorObject);
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+
+test('deletePurchase', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(basePurchase, "deleteOne").mockResolvedValue(deleteOne0);
+    
+    await purchaseController.deletePurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toBe(deleteOne0);
+    expect(reponseStatus).toBe(200);
+
+    spy.mockRestore();
+});
+test('deletePurchase no deleted', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(basePurchase, "deleteOne").mockResolvedValue(deleteNoOne);
+    
+    await purchaseController.deletePurchase(mockRequest, mockResponse);
+
+    let responseBody = mockResponse.status().json.mock.calls[0][0];
+    let reponseStatus = mockStatusCode.mock.calls[0][0];
+
+    expect(responseBody).toMatchObject({errorMessage: "No modification"});
+    expect(reponseStatus).toBe(500);
+
+    spy.mockRestore();
+});
+test('deletePurchase error', async () => {
+    let mockStatusCode = jest.fn();
+    let mockResponse = {
+        status : mockStatusCode.mockReturnValue({json: jest.fn()})
+    }
+
+    let mockRequest = {
+        params: {
+            id: list0._id
+        }
+    };
+
+    let spy = jest.spyOn(basePurchase, "deleteOne").mockRejectedValue(
+        new Error(errorMessage)
+    );
+    
+    await purchaseController.deletePurchase(mockRequest, mockResponse);
 
     let responseBody = mockResponse.status().json.mock.calls[0][0];
     let reponseStatus = mockStatusCode.mock.calls[0][0];
