@@ -26,7 +26,8 @@
         "src/controllers/*",
         "src/compute/*",
         "src/compute/base/*",
-        "tests/**/*.ts"
+        "tests/**/*.ts",
+        "tests/**/**/*.ts"
     ],
     "exclude": [
         "build/*"
