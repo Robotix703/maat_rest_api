@@ -4,7 +4,7 @@
   "description": "Rest API serveur for maat",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build ; ls build/tests/compute/base ; ls build/models ; jest",
+    "test": "npm run build ; ls build/tests/compute/base ; ls build ; jest",
     "runDev": "NODE_ENV=dev node ./build/server.js",
     "start": "NODE_ENV=production node ./build/server.js",
     "build": "tsc --project ./"
