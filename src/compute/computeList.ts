@@ -4,10 +4,10 @@ import { baseUser } from "./base/user";
 
 export namespace computeList {
     export async function getPrettyListById(listId: string) : Promise<IPrettyList | Error> {
-        let prettyUsers = await baseUser.getPrettyUsers();
+        const prettyUsers = await baseUser.getPrettyUsers();
         if(!prettyUsers) throw new Error("Users not found");
 
-        let list = await baseList.getListById(listId);
+        const list = await baseList.getListById(listId);
         if(!list) throw new Error("List not found");
 
         return {
