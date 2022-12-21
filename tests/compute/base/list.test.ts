@@ -2,8 +2,8 @@ import { IList } from "../../../src/models/list";
 
 const mockingoose = require('mockingoose');
 
-const List = require("../../../models/list").default;
-const baseList = require("../../../compute/base/list").baseList;
+const List = require("../../../src/models/list").default;
+const baseList = require("../../../src/compute/base/list").baseList;
 
 let list : IList = {
     _id: "63a22beaeb867d512d19520f",

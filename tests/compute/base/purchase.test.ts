@@ -2,8 +2,8 @@ import { IPrettyUser } from "../../../src/models/user";
 
 const mockingoose = require('mockingoose');
 
-const Purchase = require("../../../models/purchase").default;
-const basePurchase = require("../../../compute/base/purchase").basePurchase;
+const Purchase = require("../../../src/models/purchase").default;
+const basePurchase = require("../../../src/compute/base/purchase").basePurchase;
 
 const purchase0 : any = {
     _id: "63a2333423934b08e25a19e2",
