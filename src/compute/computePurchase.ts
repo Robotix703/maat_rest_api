@@ -146,7 +146,6 @@ export namespace computePurchase {
         if(!users) throw new Error("Users not found");
 
         let prettyPurchases : IPrettyPurchase[] = [];
-
         for(let purchase of purchases){
             prettyPurchases.push({
                 _id: purchase._id,

@@ -89,6 +89,20 @@ const purchase1to0 : any = {
     balance0: -10,
     balance1: 10
 }
+const prettyPurchase : any = {
+    _id: '',
+    title: "purchaseTitle",
+    amount: 10,
+    date: "2022-12-21T22:01:45.411Z",
+    buyTo: ["userName1"],
+    from: "userName0",
+    user0: prettyUser0,
+    user1: prettyUser1,
+    total0: 10,
+    total1: 0,
+    balance0: 10,
+    balance1: -10
+}
 const purchase0to1 : any = {
     _id: '',
     title: "purchaseTitle",
@@ -326,4 +340,13 @@ test('add 0 to 01', async () => {
 
     registerMock.mockRestore();
     updateMock.mockRestore();
+});
+
+test('getPurchasesByListId', async () => {
+    jest.spyOn(basePurchase, "getPurchasesByListId").mockResolvedValue([purchase0to1]);
+    jest.spyOn(baseList, "getListById").mockResolvedValue(list);
+    jest.spyOn(baseUser, "getPrettyUsers").mockResolvedValue([prettyUser0, prettyUser1]);
+   
+    const result = await computePurchase.getPurchasesByListId(list._id);
+    expect(result).toMatchObject([prettyPurchase]);
 });
