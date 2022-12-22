@@ -136,10 +136,10 @@ export namespace purchaseController {
 
   //DELETE
   export async function deletePurchase(req: any, res: any){
-    return basePurchase.deleteOne(req.params.id)
-    .then((result: IDeleteOne) => {
-      if (result.deletedCount > 0) res.status(200).json(result);
-      else res.status(500).json({errorMessage: "No modification"});
+    return computePurchase.deletePurchase(req.params.id)
+    .then((result: IUpdateOne) => {
+      if (result.modifiedCount > 0) res.status(200).json({status: "OK"});
+      else res.status(401).json({ message: "Pas de modification" });
     })
     .catch((error: Error) => {
       res.status(500).json({errorMessage: error.message});

@@ -603,18 +603,18 @@ test('deletePurchase', async () => {
 
     let mockRequest = {
         params: {
-            id: list0._id
+            id: purchase0._id
         }
     };
 
-    let spy = jest.spyOn(basePurchase, "deleteOne").mockResolvedValue(deleteOne0);
+    let spy = jest.spyOn(computePurchase, "deletePurchase").mockResolvedValue(updateOne0);
     
     await purchaseController.deletePurchase(mockRequest, mockResponse);
 
     let responseBody = mockResponse.status().json.mock.calls[0][0];
     let reponseStatus = mockStatusCode.mock.calls[0][0];
 
-    expect(responseBody).toBe(deleteOne0);
+    expect(responseBody).toMatchObject(statusOK);
     expect(reponseStatus).toBe(200);
 
     spy.mockRestore();
@@ -631,15 +631,15 @@ test('deletePurchase no deleted', async () => {
         }
     };
 
-    let spy = jest.spyOn(basePurchase, "deleteOne").mockResolvedValue(deleteNoOne);
+    let spy = jest.spyOn(computePurchase, "deletePurchase").mockResolvedValue(updateOneNotUpdate);
     
     await purchaseController.deletePurchase(mockRequest, mockResponse);
 
     let responseBody = mockResponse.status().json.mock.calls[0][0];
     let reponseStatus = mockStatusCode.mock.calls[0][0];
 
-    expect(responseBody).toMatchObject({errorMessage: "No modification"});
-    expect(reponseStatus).toBe(500);
+    expect(responseBody).toMatchObject(statusNotUpdated);
+    expect(reponseStatus).toBe(401);
 
     spy.mockRestore();
 });
@@ -655,7 +655,7 @@ test('deletePurchase error', async () => {
         }
     };
 
-    let spy = jest.spyOn(basePurchase, "deleteOne").mockRejectedValue(
+    let spy = jest.spyOn(computePurchase, "deletePurchase").mockRejectedValue(
         new Error(errorMessage)
     );
     

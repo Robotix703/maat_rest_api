@@ -30,7 +30,7 @@ export namespace computePurchase {
     export function attribute(from: IUserName, users: IPrettyUser[], amount: number) : ITotals {
         let result : ITotals = {total0: 0, total1: 0};
 
-        (from === users[0].name.toString()) ? result.total0 = amount : result.total1 = amount;
+        (from == users[0].name) ? result.total0 = amount : result.total1 = amount;
         return result;
     }
 
@@ -38,21 +38,21 @@ export namespace computePurchase {
         let result : IBalance = {balance0: 0, balance1: 0};
         if(buyTo.length == 1){
             //Buy for himself
-            if(buyTo[0] === from) return null;
+            if(buyTo[0] == from) return null;
             //Buy for the seconde one
             else
             {
                 //Balance
-                result.balance0 = (from === users[0].name.toString()) ? amount : -amount;
-                result.balance1 = (from === users[1].name.toString()) ? amount : -amount;
+                result.balance0 = (from == users[0].name) ? amount : -amount;
+                result.balance1 = (from == users[1].name) ? amount : -amount;
             }
         }
         //Divide
         else
         {
             //Balance
-            result.balance0 = (from === users[0].name.toString()) ? amount / 2 : -amount / 2;
-            result.balance1 = (from === users[1].name.toString()) ? amount / 2 : -amount / 2;
+            result.balance0 = (from == users[0].name) ? amount / 2 : -amount / 2;
+            result.balance1 = (from == users[1].name) ? amount / 2 : -amount / 2;
         }
         return result;
     }
@@ -218,6 +218,11 @@ export namespace computePurchase {
         const balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
         if(!balance) throw new Error("From is buyTo");
 
+        list.balance0 += balance.balance0;
+        list.balance1 += balance.balance1;
+        list.total0 += totals.total0;
+        list.total1 += totals.total1;
+
         //Register new purchase
         let update = await basePurchase.update(
             data.id,
@@ -235,6 +240,41 @@ export namespace computePurchase {
         if(!update.acknowledged) throw new Error("Update went wrong");
 
         //Apply new purchase on list
+        return baseList.update(
+            list._id,
+            list.name,
+            list.main,
+            list.total0,
+            list.total1,
+            list.balance0,
+            list.balance1,
+            list.merged
+        )
+        .then((result: IUpdateOne) => {
+            return result;
+        })
+        .catch((error: Error) => {
+            throw error;
+        });
+    }
+
+    export async function deletePurchase(purchaseId : string) : Promise<IUpdateOne> {
+        //Get Purchase
+        const purchase: IPurchase = await basePurchase.getPurchase(purchaseId);
+        if(!purchase) throw new Error("Purchase not found");
+
+        //Revert purchase inside List
+        let list: IList = await baseList.getListById(purchase.listId);
+        if(!list) throw new Error("List not found");
+
+        list.balance0 -= purchase.balance0;
+        list.balance1 -= purchase.balance1;
+        list.total0 -= purchase.total0;
+        list.total1 -= purchase.total1;
+
+        const deleteOne = await basePurchase.deleteOne(purchaseId);
+        if(deleteOne.deletedCount <= 0) throw new Error("Error on purchase deletion");
+
         return baseList.update(
             list._id,
             list.name,
