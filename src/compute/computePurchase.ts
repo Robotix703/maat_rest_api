@@ -19,22 +19,22 @@ export namespace computePurchase {
         total1: number
     }
 
-    function UserNameToUserId(user : IUserName, users: IPrettyUser[]): IUserID {
+    export function UserNameToUserId(user : IUserName, users: IPrettyUser[]): IUserID {
         return (user === users[0].name) ? users[0].id : users[1].id;
     }
 
-    function UserIdToUserName(user : IUserID, users: IPrettyUser[]): IUserName {
+    export function UserIdToUserName(user : IUserID, users: IPrettyUser[]): IUserName {
         return (user === users[0].id) ? users[0].name : users[1].name;
     }
 
-    function attribute(from: IUserName, users: IPrettyUser[], amount: number) : ITotals {
+    export function attribute(from: IUserName, users: IPrettyUser[], amount: number) : ITotals {
         let result : ITotals = {total0: 0, total1: 0};
 
         (from === users[0].name.toString()) ? result.total0 = amount : result.total1 = amount;
         return result;
     }
 
-    function divide(buyTo: IUserName[], from: IUserName, amount: number, users: IPrettyUser[]) : IBalance {
+    export function divide(buyTo: IUserName[], from: IUserName, amount: number, users: IPrettyUser[]) : IBalance | null {
         let result : IBalance = {balance0: 0, balance1: 0};
         if(buyTo.length == 1){
             //Buy for himself
@@ -65,7 +65,7 @@ export namespace computePurchase {
         //List
         let list = await baseList.getListById(data.listId);
         if(!list) return new Error("Error with list");
-
+        
         //Update list
         list.balance0 += purchase.balance0;
         list.balance1 += purchase.balance1;
@@ -73,7 +73,7 @@ export namespace computePurchase {
         list.total1 += purchase.total1;
 
         //Register purchase
-        return basePurchase.register(
+        const purchaseRegistered = await basePurchase.register(
             purchase.title,
             purchase.amount,
             purchase.date,
@@ -85,22 +85,22 @@ export namespace computePurchase {
             purchase.balance0,
             purchase.balance1
         )
-        .then((result: IPurchase) => {
-            //Update List
-            return baseList.updateTotalAndBalance(
-                data.listId,
-                list.total0,
-                list.total1,
-                list.balance0,
-                list.balance1
-            )
-            .then((result: IUpdateOne) => {
-                if (result.modifiedCount > 0) return {status: "OK"};
-                else return new Error("Error when updating list");
-            })
-            .catch((error: Error) => {
-                throw error;
-            });
+        .catch((error: Error) => {
+            throw error;
+        });
+        if(!purchaseRegistered) throw new Error("Purchase not registered");
+
+        //Update List
+        return baseList.updateTotalAndBalance(
+            data.listId,
+            list.total0,
+            list.total1,
+            list.balance0,
+            list.balance1
+        )
+        .then((result: IUpdateOne) => {
+            if (result.modifiedCount > 0) return {status: "OK"};
+            else return new Error("Error when updating list");
         })
         .catch((error: Error) => {
             throw error;
@@ -112,12 +112,15 @@ export namespace computePurchase {
         if(!prettyUser) throw new Error("Users not found");
 
         const convertedFrom = UserIdToUserName(data.from, prettyUser);
-        const convertedBuyTo = [UserIdToUserName(data.buyTo[0], prettyUser), UserIdToUserName(data.buyTo[1], prettyUser)]
-
+        const convertedBuyTo = 
+            (data.buyTo.length == 1) ?
+            [UserIdToUserName(data.buyTo[0], prettyUser)] :
+            [UserIdToUserName(data.buyTo[0], prettyUser), UserIdToUserName(data.buyTo[1], prettyUser)];
         let totals: ITotals = attribute(convertedFrom, prettyUser, data.amount);
         let balance: IBalance = divide(convertedBuyTo, convertedFrom, data.amount, prettyUser);
+        if(!balance) throw new Error("From is buyTo");
 
-        const newPurchase: IPurchase = {
+        return {
             _id: '',
             title: data.title,
             amount: data.amount,
@@ -129,8 +132,7 @@ export namespace computePurchase {
             total1: totals.total1,
             balance0: balance.balance0,
             balance1: balance.balance1
-        }
-        return newPurchase;
+        };
     }
 
     export async function getPurchasesByListId(listId: string) : Promise<IPrettyPurchase[]>{

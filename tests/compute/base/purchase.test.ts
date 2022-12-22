@@ -18,16 +18,6 @@ const purchase0 : any = {
     balance0: 13,
     balance1: 14
 }
-let prettyUser0 : IPrettyUser = {
-    name: "userName0",
-    id: "userId0",
-    number: 10
-}
-let prettyUser1 : IPrettyUser = {
-    name: "userName1",
-    id: "userId1",
-    number: 20
-}
 
 test('getPurchasesByListId', async () => {
     mockingoose(Purchase).toReturn([purchase0], 'find');

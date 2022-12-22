@@ -5,7 +5,7 @@ const mockingoose = require('mockingoose');
 const List = require("../../../src/models/list").default;
 const baseList = require("../../../src/compute/base/list").baseList;
 
-let list : IList = {
+const list : IList = {
     _id: "63a22beaeb867d512d19520f",
     name: "nameList",
     main: true,
