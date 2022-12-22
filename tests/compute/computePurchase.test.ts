@@ -350,3 +350,12 @@ test('getPurchasesByListId', async () => {
     const result = await computePurchase.getPurchasesByListId(list._id);
     expect(result).toMatchObject([prettyPurchase]);
 });
+
+test('getPurchasesByPurchaseId', async () => {
+    jest.spyOn(basePurchase, "getPurchase").mockResolvedValue(purchase0to1._id);
+    jest.spyOn(baseList, "getListById").mockResolvedValue(list);
+    jest.spyOn(baseUser, "getPrettyUsers").mockResolvedValue([prettyUser0, prettyUser1]);
+   
+    const result = await computePurchase.getPurchasesByListId(list._id);
+    expect(result).toMatchObject([prettyPurchase]);
+});
