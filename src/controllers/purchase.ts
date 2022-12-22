@@ -41,7 +41,6 @@ export namespace purchaseController {
       from: req.body.from,
       listId: req.body.listId
     };
-
     return computePurchase.add(data)
     .then((result: IStatus) => {
       if(result.status === "OK"){

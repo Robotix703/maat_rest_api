@@ -20,11 +20,11 @@ export namespace computePurchase {
     }
 
     export function UserNameToUserId(user : IUserName, users: IPrettyUser[]): IUserID {
-        return (user === users[0].name) ? users[0].id : users[1].id;
+        return (user == users[0].name) ? users[0].id : users[1].id;
     }
 
     export function UserIdToUserName(user : IUserID, users: IPrettyUser[]): IUserName {
-        return (user === users[0].id) ? users[0].name : users[1].name;
+        return (user == users[0].id) ? users[0].name : users[1].name;
     }
 
     export function attribute(from: IUserName, users: IPrettyUser[], amount: number) : ITotals {
@@ -148,23 +148,16 @@ export namespace computePurchase {
         let prettyPurchases : IPrettyPurchase[] = [];
 
         for(let purchase of purchases){
-            let prettyBuyTo : string[] = [];
-            for(let user of purchase.buyTo){
-                prettyBuyTo.push(
-                    (users[0].id == user) ? users[0].name : users[1].name
-                );
-            }
-
             prettyPurchases.push({
                 _id: purchase._id,
                 title: purchase.title,
                 list: list,
                 amount: purchase.amount,
                 date: purchase.date,
-                buyTo: prettyBuyTo,
-                from: (users[0].id == purchase.from) ? users[0].name : users[1].name,
+                buyTo: purchase.buyTo,
+                from: purchase.from,
                 user0: (users[0].number == 0) ? users[0] : users[1],
-                user1: (users[0].number == 0) ? users[0] : users[1],
+                user1: (users[1].number == 0) ? users[0] : users[1],
                 total0: purchase.total0,
                 total1: purchase.total1,
                 balance0: purchase.balance0,
@@ -185,21 +178,14 @@ export namespace computePurchase {
         const users: IPrettyUser[] | void = await baseUser.getPrettyUsers();
         if(!users) throw new Error("Users not found");
 
-        let prettyBuyTo : string[] = [];
-        for(let user of purchase.buyTo){
-            prettyBuyTo.push(
-                (users[0].id == user) ? users[0].name : users[1].name
-            );
-        }
-
         let prettyPurchases : IPrettyPurchase = {
             _id: purchase._id,
             title: purchase.title,
             list: list,
             amount: purchase.amount,
             date: purchase.date,
-            buyTo: prettyBuyTo,
-            from: (users[0].id == purchase.from) ? users[0].name : users[1].name,
+            buyTo: purchase.buyTo,
+            from: purchase.from,
             user0: (users[0].number == 0) ? users[0] : users[1],
             user1: (users[1].number == 1) ? users[1] : users[0],
             total0: purchase.total0,

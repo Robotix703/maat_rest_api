@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "rm build/* -r ; npm run build ; jest",
-    "runDev": "NODE_ENV=dev node ./build/server.js",
-    "start": "NODE_ENV=production node ./build/server.js",
+    "runDev": "tsc --project ./ ; NODE_ENV=dev node ./build/src/server.js",
+    "start": "NODE_ENV=production node ./build/src/server.js",
     "build": "tsc --project ./"
   },
   "repository": {
