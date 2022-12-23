@@ -1,5 +1,5 @@
 import { IList } from "../../src/models/list";
-import { IUpdateOne } from "../../src/models/mongoose";
+import { IUpdateOne, IDeleteOne } from "../../src/models/mongoose";
 import { IPrettyUpdatePurchase, ISendPurchaseData } from "../../src/models/purchase";
 import { IPrettyUser } from "../../src/models/user";
 
@@ -139,6 +139,11 @@ const prettyPurchaseUpdate : IPrettyUpdatePurchase = {
     amount: 100,
     buyTo: [prettyUser1.name],
     from: prettyUser0.name
+}
+const deleteOne : IDeleteOne = {
+    n: 1,
+    deletedCount: 1,
+    ok: 1
 }
 
 test('UserNameToUserId', async () => {
@@ -401,5 +406,27 @@ test('updatePrettyPurchase 0 to 1', async () => {
     expect(listUpdateResult[7]).toBe(list.merged);
 
     purchaseUpdateMock.mockRestore();
+    listUpdateMock.mockRestore();
+});
+
+test('deletePurchase 0 to 1', async () => {
+    jest.spyOn(basePurchase, "getPurchase").mockResolvedValue(purchase0to1);
+    jest.spyOn(baseList, "getListById").mockResolvedValue({...list});
+    jest.spyOn(basePurchase, "deleteOne").mockResolvedValue(deleteOne);
+    let listUpdateMock = jest.spyOn(baseList, "update").mockResolvedValue(updateOne);
+   
+    const result = await computePurchase.deletePurchase(purchase0to1.id);
+    expect(result).toMatchObject(updateOne);
+
+    const listUpdateResult = listUpdateMock.mock.calls[0];
+    expect(listUpdateResult[0]).toBe(list._id);
+    expect(listUpdateResult[1]).toBe(list.name);
+    expect(listUpdateResult[2]).toBe(list.main);
+    expect(listUpdateResult[3]).toBe(list.total0 - purchase0to1.total0);
+    expect(listUpdateResult[4]).toBe(list.total1);
+    expect(listUpdateResult[5]).toBe(list.balance0 - purchase0to1.balance0);
+    expect(listUpdateResult[6]).toBe(list.balance1 - purchase0to1.balance1);
+    expect(listUpdateResult[7]).toBe(list.merged);
+
     listUpdateMock.mockRestore();
 });
