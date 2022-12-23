@@ -1,6 +1,6 @@
 import { IList } from "../../src/models/list";
 import { IUpdateOne } from "../../src/models/mongoose";
-import { ISendPurchaseData } from "../../src/models/purchase";
+import { IPrettyUpdatePurchase, ISendPurchaseData } from "../../src/models/purchase";
 import { IPrettyUser } from "../../src/models/user";
 
 const computePurchase = require("../../src/compute/computePurchase").computePurchase;
@@ -90,7 +90,7 @@ const purchase1to0 : any = {
     balance1: 10
 }
 const prettyPurchase : any = {
-    _id: '',
+    _id: 'id0to1',
     title: "purchaseTitle",
     amount: 10,
     date: "2022-12-21T22:01:45.411Z",
@@ -104,7 +104,7 @@ const prettyPurchase : any = {
     balance1: -10
 }
 const purchase0to1 : any = {
-    _id: '',
+    _id: 'id0to1',
     title: "purchaseTitle",
     amount: 10,
     date: "2022-12-21T22:01:45.411Z",
@@ -117,7 +117,7 @@ const purchase0to1 : any = {
     balance1: -10
 }
 const purchase0to01 : any = {
-    _id: '',
+    _id: 'id0to01',
     title: "purchaseTitle",
     amount: 10,
     date: "2022-12-21T22:01:45.411Z",
@@ -132,6 +132,13 @@ const purchase0to01 : any = {
 const updateOne : IUpdateOne = {
     modifiedCount: 1,
     acknowledged: true
+}
+const prettyPurchaseUpdate : IPrettyUpdatePurchase = {
+    id: purchase0to1._id,
+    title: "purchaseTitle",
+    amount: 100,
+    buyTo: [prettyUser1.name],
+    from: prettyUser0.name
 }
 
 test('UserNameToUserId', async () => {
@@ -358,4 +365,41 @@ test('getPurchasesByPurchaseId', async () => {
    
     const result = await computePurchase.getPurchasesByListId(list._id);
     expect(result).toMatchObject([prettyPurchase]);
+});
+
+test('updatePrettyPurchase 0 to 1', async () => {
+    jest.spyOn(basePurchase, "getPurchase").mockResolvedValue(purchase0to1);
+    jest.spyOn(baseList, "getListById").mockResolvedValue({...list});
+    jest.spyOn(baseUser, "getPrettyUsers").mockResolvedValue([prettyUser0, prettyUser1]);
+    let purchaseUpdateMock = jest.spyOn(basePurchase, "update").mockResolvedValue(updateOne);
+    let listUpdateMock = jest.spyOn(baseList, "update").mockResolvedValue(updateOne);
+   
+    const result = await computePurchase.updatePrettyPurchase(prettyPurchaseUpdate);
+    expect(result).toMatchObject(updateOne);
+
+    const purchaseUpdateResult = purchaseUpdateMock.mock.calls[0];
+    expect(purchaseUpdateResult[0]).toBe(prettyPurchaseUpdate.id);
+    expect(purchaseUpdateResult[1]).toBe(prettyPurchaseUpdate.title);
+    expect(purchaseUpdateResult[2]).toBe(prettyPurchaseUpdate.amount);
+    expect(purchaseUpdateResult[3]).toBe(purchase0to1.date);
+    expect(purchaseUpdateResult[4]).toBe(prettyPurchaseUpdate.buyTo);
+    expect(purchaseUpdateResult[5]).toBe(prettyPurchaseUpdate.from);
+    expect(purchaseUpdateResult[6]).toBe(purchase0to1.listId);
+    expect(purchaseUpdateResult[7]).toBe(prettyPurchaseUpdate.amount);
+    expect(purchaseUpdateResult[8]).toBe(0);
+    expect(purchaseUpdateResult[9]).toBe(prettyPurchaseUpdate.amount);
+    expect(purchaseUpdateResult[10]).toBe(-prettyPurchaseUpdate.amount);
+
+    const listUpdateResult = listUpdateMock.mock.calls[0];
+    expect(listUpdateResult[0]).toBe(list._id);
+    expect(listUpdateResult[1]).toBe(list.name);
+    expect(listUpdateResult[2]).toBe(list.main);
+    expect(listUpdateResult[3]).toBe((list.total0 - purchase0to1.total0) + prettyPurchaseUpdate.amount);
+    expect(listUpdateResult[4]).toBe(list.total1);
+    expect(listUpdateResult[5]).toBe((list.balance0 - purchase0to1.balance0) + prettyPurchaseUpdate.amount);
+    expect(listUpdateResult[6]).toBe((list.balance1 - purchase0to1.balance1) - prettyPurchaseUpdate.amount);
+    expect(listUpdateResult[7]).toBe(list.merged);
+
+    purchaseUpdateMock.mockRestore();
+    listUpdateMock.mockRestore();
 });

@@ -216,7 +216,7 @@ export namespace computePurchase {
         const totals: ITotals = attribute(data.from, prettyUser, data.amount);
         const balance: IBalance = divide(data.buyTo, data.from, data.amount, prettyUser);
         if(!balance) throw new Error("From is buyTo");
-
+        
         list.balance0 += balance.balance0;
         list.balance1 += balance.balance1;
         list.total0 += totals.total0;
