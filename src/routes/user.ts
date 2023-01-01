@@ -9,5 +9,4 @@ export const userRoutes = express.Router();
 userRoutes.get("/all", checkAuth, userController.getAllUser);
 
 //POST
-userRoutes.post("/signup", userController.createUser);
 userRoutes.post("/login", userController.userLogin);

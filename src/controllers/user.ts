@@ -9,53 +9,6 @@ import jwt from "jsonwebtoken";
 import { baseUser } from "../compute/base/user";
 
 export namespace userController {
-  export function createUser(req: Request, res: Response){
-    if (req.body.invitationCode !== process.env.INVITECODE) {
-      res.status(500).json({
-        message: "Wrong invitation code"
-      });
-      return;
-    }
-  
-    bcrypt.hash(req.body.password, 10).then((hash: string) => {
-      baseUser.register(req.body.name, hash, req.body.userNumber)
-        .then((result: IUser) => {
-          if(!result) {
-            res.status(500).json({
-              message: "Wrong invitation code"
-            });
-            return;
-          };
-
-          baseUser.getByName(req.body.name)
-          .then((user: IUser) => { 
-            const token = jwt.sign(
-              {
-                email: user.name,
-                userId: user._id,
-                number: user.number
-              },
-              process.env.JWT as jwt.Secret,
-              { expiresIn: "12h" }
-            );
-      
-            res.status(200).json({
-              token: token,
-              expiresIn: parseInt(process.env.TOKENLIFETIME as string) * 60 * 60,
-              userId: user._id,
-              number: user.number,
-              name: user.name
-            });
-          });
-        })
-        .catch((error: Error) => {
-          res.status(500).json({
-            error: error.message
-          });
-        });
-    });
-  };
-  
   export function userLogin(req: Request, res: Response){
     let fetchUser: IUser;
   
