@@ -2,12 +2,11 @@ import { IDeleteOne } from "../../models/mongoose";
 import User, { IPrettyUser, IUser } from "../../models/user";
 
 export namespace baseUser {
-    export async function register(name: string, password: string, number: number, api_key: string) : Promise<IUser | Error> {
+    export async function register(name: string, number: number, api_key: string) : Promise<IUser | Error> {
         if(number < 0 || number > 1) return new Error("Wrong number");
 
         const user = new User({
             name: name,
-            password: password,
             number: number,
             api_key: api_key
         });
