@@ -3,16 +3,13 @@ require('dotenv').config();
 import { Request, Response } from "express";
 import { IPrettyUser, IUser } from "../models/user";
 
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-
 import { baseUser } from "../compute/base/user";
 
 export namespace userController {
   export function userLogin(req: Request, res: Response){
     let fetchUser: IUser;
   
-    baseUser.getByName(req.body.name)
+    baseUser.getByName(req.body.userName)
     .then((user: IUser) => {
       fetchUser = user;
   
@@ -22,33 +19,20 @@ export namespace userController {
         });
         return;
       }
-      bcrypt.compare(req.body.password, user.password)
-      .then((result: boolean) => {
-        if (!result) {
-          res.status(401).json({
-            message: "Mauvaise Mot de passe"
-          });
-          return;
-        }
-  
-        const token = jwt.sign(
-          {
-            email: fetchUser.name,
-            userId: fetchUser._id,
-            number: fetchUser.number
-          },
-          process.env.JWT as jwt.Secret,
-          { expiresIn: "12h" }
-        );
-  
+
+      if(fetchUser.api_key == req.body.apiKey){
         res.status(200).json({
-          token: token,
-          expiresIn: parseInt(process.env.TOKENLIFETIME as string) * 60 * 60,
           userId: fetchUser._id,
-          number: fetchUser.number,
-          name: fetchUser.name
+          userNumber: fetchUser.number,
+          userName: fetchUser.name
         });
-      })
+      }
+      else
+      {
+        res.status(401).json({
+          errorMessage: "Wrong API Key"
+        });
+      }
     })
     .catch((error: Error) => {
       res.status(401).json({

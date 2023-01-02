@@ -20,22 +20,18 @@
   },
   "homepage": "https://github.com/Robotix703/maat_rest_api#readme",
   "dependencies": {
-    "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.7.0",
     "mongoose-unique-validator": "^3.1.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
     "@types/jest": "^29.2.4",
-    "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.11.11",
     "jest": "^28.1.0",
     "mockingoose": "^2.15.2",
